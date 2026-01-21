@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import PropertyCard from "@/components/PropertyCard";
+import ScrollReveal from "@/components/ScrollReveal";
+import PropertyCardGrid from "@/components/PropertyCardGrid";
 import { getProperties } from "@/lib/properties";
 import type { Property } from "@/types/database";
 
@@ -55,7 +56,7 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Filters Sidebar */}
               <aside className="lg:col-span-3 space-y-6">
-                <div className="bg-white border border-border-gray rounded-button p-6 space-y-6">
+                <div className="bg-white border border-border-gray rounded-card p-6 space-y-6">
                   {/* Availability Filter */}
                   <div>
                     <h3 className="font-semibold text-text-primary mb-4">
@@ -192,24 +193,25 @@ export default function SearchPage() {
                     <p className="text-text-secondary">Loading properties...</p>
                   </div>
                 ) : filteredProperties.length > 0 ? (
-                  <div className="space-y-0">
-                    {filteredProperties.map((property) => (
-                      <PropertyCard
-                        key={property.id}
-                        id={property.id}
-                        title={property.title}
-                        price={property.price}
-                        location={property.city}
-                        neighborhood={property.neighborhood}
-                        type={property.type}
-                        bedrooms={property.bedrooms}
-                        bathroom={property.bathroom}
-                        image={property.images[0] || ""}
-                        available={property.available}
-                        whatsappNumber={property.whatsapp_number || undefined}
-                      />
-                    ))}
-                  </div>
+                  <ScrollReveal>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {filteredProperties.map((property) => (
+                        <PropertyCardGrid
+                          key={property.id}
+                          id={property.id}
+                          title={property.title}
+                          price={property.price}
+                          location={property.city}
+                          neighborhood={property.neighborhood}
+                          type={property.type}
+                          bedrooms={property.bedrooms}
+                          bathroom={property.bathroom}
+                          image={property.images[0] || ""}
+                          available={property.available}
+                        />
+                      ))}
+                    </div>
+                  </ScrollReveal>
                 ) : (
                   <div className="text-center py-16">
                     <div className="text-6xl mb-4">🏠</div>

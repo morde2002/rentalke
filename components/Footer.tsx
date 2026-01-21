@@ -1,13 +1,22 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
     <footer className="bg-text-primary text-white">
       <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
           {/* Logo & Description */}
-          <div className="md:col-span-2">
-            <h3 className="text-2xl font-semibold mb-4">RentalKE</h3>
+          <div className="md:col-span-2 flex flex-col items-center md:items-start">
+            <div className="bg-white rounded-lg p-4 inline-block mb-4">
+              <Image
+                src="/images/rentalkelogo.png"
+                alt="RentalKE"
+                width={200}
+                height={56}
+                className="h-10 w-auto"
+              />
+            </div>
             <p className="text-gray-400 mb-6 max-w-md">
               Find affordable rental homes in Kenya. No agents, no stress. Connect directly with landlords and find your next home in minutes.
             </p>
@@ -17,7 +26,7 @@ export default function Footer() {
                 href="https://xeleratedtech.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary-blue-hover hover:text-accent-purple transition-colors"
+                className="text-white hover:text-gray-300 transition-colors"
               >
                 Xelerated Tech
               </a>

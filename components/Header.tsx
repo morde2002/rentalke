@@ -1,18 +1,29 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <header className="bg-white border-b border-border-gray sticky top-0 z-50">
       <div className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-semibold text-text-primary">
-              RentalKE
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/images/rentalkelogo.png"
+              alt="RentalKE"
+              width={180}
+              height={50}
+              priority
+              className="h-10 w-auto"
+            />
           </Link>
 
-          {/* Navigation */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/search"
@@ -35,13 +46,64 @@ export default function Header() {
             </Link>
 
             {/* Mobile Menu Button */}
-            <button className="md:hidden p-2 text-text-secondary">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-text-secondary relative w-10 h-10 flex items-center justify-center"
+              aria-label="Toggle menu"
+            >
+              <span className="sr-only">Toggle menu</span>
+              {/* Hamburger Icon */}
+              <div className="relative w-6 h-5">
+                <span
+                  className={`absolute left-0 w-6 h-0.5 bg-current transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen ? "top-2 rotate-45" : "top-0 rotate-0"
+                  }`}
+                ></span>
+                <span
+                  className={`absolute left-0 top-2 w-6 h-0.5 bg-current transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                ></span>
+                <span
+                  className={`absolute left-0 w-6 h-0.5 bg-current transition-all duration-300 ease-in-out ${
+                    mobileMenuOpen ? "top-2 -rotate-45" : "top-4 rotate-0"
+                  }`}
+                ></span>
+              </div>
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
+          mobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <nav className="container-custom py-4 space-y-4 border-t border-border-gray">
+          <Link
+            href="/search"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-center py-3 text-text-secondary hover:text-text-primary hover:bg-bg-light rounded-card transition-colors"
+          >
+            Find a Home
+          </Link>
+          <Link
+            href="/landlords"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-center py-3 text-text-secondary hover:text-text-primary hover:bg-bg-light rounded-card transition-colors"
+          >
+            List Your House
+          </Link>
+          <Link
+            href="/landlords"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-center btn-primary w-full"
+          >
+            List Your House
+          </Link>
+        </nav>
       </div>
     </header>
   );

@@ -15,21 +15,31 @@ export default function ScrollReveal({ children, delay = 0, className = "" }: Sc
     const element = elementRef.current;
     if (!element) return;
 
-    // Create intersection observer
+    let timeoutId: NodeJS.Timeout;
+
+    // Create intersection observer with bidirectional animation
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Add animation class when element enters viewport
-            setTimeout(() => {
+            // Element is entering viewport - fade in
+            if (delay > 0) {
+              timeoutId = setTimeout(() => {
+                element.classList.add("scroll-reveal-visible");
+              }, delay);
+            } else {
               element.classList.add("scroll-reveal-visible");
-            }, delay);
+            }
+          } else {
+            // Element is leaving viewport - fade out
+            if (timeoutId) clearTimeout(timeoutId);
+            element.classList.remove("scroll-reveal-visible");
           }
         });
       },
       {
         threshold: 0.1, // Trigger when 10% of element is visible
-        rootMargin: "0px 0px -50px 0px", // Trigger slightly before element is fully visible
+        rootMargin: "-60px 0px -60px 0px", // Create buffer zones at top and bottom
       }
     );
 
@@ -39,6 +49,7 @@ export default function ScrollReveal({ children, delay = 0, className = "" }: Sc
       if (element) {
         observer.unobserve(element);
       }
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [delay]);
 

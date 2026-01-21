@@ -85,19 +85,20 @@ export default function HomePage() {
         {/* Hero Section */}
         <section className="section-padding bg-white">
         <div className="container-custom">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            {/* Main Headline */}
-            <h1 className="text-4xl md:text-6xl font-semibold text-text-primary">
-              Find Your Next Home in Minutes
-            </h1>
+          <ScrollReveal>
+            <div className="max-w-4xl mx-auto text-center space-y-8">
+              {/* Main Headline */}
+              <h1 className="text-4xl md:text-6xl font-semibold text-text-primary leading-tight">
+                Find Your Next Home <br className="hidden sm:inline" />in Minutes
+              </h1>
 
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto">
-              Affordable rentals in Kenya. No agents. No stress. Just simple.
-            </p>
+              {/* Subheadline */}
+              <p className="text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto">
+                Affordable rentals in Kenya. No agents. No stress. Just simple.
+              </p>
 
-            {/* Search Box */}
-            <div className="mt-12 max-w-2xl mx-auto relative" ref={dropdownRef}>
+              {/* Search Box */}
+              <div className="mt-12 max-w-2xl mx-auto relative" ref={dropdownRef}>
               <form onSubmit={handleSearch} className="bg-white rounded-button shadow-lg p-2 flex flex-col sm:flex-row gap-2">
                 <div className="flex-1 relative">
                   <input
@@ -160,7 +161,8 @@ export default function HomePage() {
                 <span>Updated daily</span>
               </div>
             </div>
-          </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

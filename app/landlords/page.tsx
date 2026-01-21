@@ -11,14 +11,16 @@ export default function LandlordsPage() {
         {/* Hero Section */}
         <section className="section-padding">
           <div className="container-custom">
-            <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h1 className="text-4xl md:text-5xl font-semibold">
-                List Your House for FREE
-              </h1>
-              <p className="text-xl text-text-secondary">
-                Get your house in front of hundreds of tenants looking for homes in Kenya
-              </p>
-            </div>
+            <ScrollReveal>
+              <div className="max-w-3xl mx-auto text-center space-y-6">
+                <h1 className="text-4xl md:text-5xl font-semibold">
+                  List Your House for FREE
+                </h1>
+                <p className="text-xl text-text-secondary">
+                  Get your house in front of hundreds of tenants looking for homes in Kenya
+                </p>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -170,7 +172,7 @@ export default function LandlordsPage() {
               <p className="text-xl mb-8 opacity-90">
                 Coming soon! We're setting up WhatsApp integration to make listing super easy.
               </p>
-              <div className="bg-white/20 rounded-button p-6">
+              <div className="rounded-button p-6">
                 <p className="text-sm mb-4">
                   Want early access? Send us a message:
                 </p>

@@ -3,10 +3,26 @@
 import { supabase } from './supabase';
 import type { Property, PropertyFilters } from '@/types/database';
 
+// Simple in-memory cache
+const cache: {
+  properties: Property[] | null;
+  timestamp: number | null;
+} = {
+  properties: null,
+  timestamp: null,
+};
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Get all properties with optional filters
  */
 export async function getProperties(filters?: PropertyFilters): Promise<Property[]> {
+  // Use cache if available and not expired (only for unfiltered requests)
+  const now = Date.now();
+  if (!filters && cache.properties && cache.timestamp && (now - cache.timestamp) < CACHE_DURATION) {
+    return cache.properties;
+  }
   let query = supabase
     .from('properties')
     .select('*')
@@ -42,6 +58,12 @@ export async function getProperties(filters?: PropertyFilters): Promise<Property
   if (error) {
     console.error('Error fetching properties:', error);
     return [];
+  }
+
+  // Update cache for unfiltered requests
+  if (!filters && data) {
+    cache.properties = data;
+    cache.timestamp = Date.now();
   }
 
   return data || [];

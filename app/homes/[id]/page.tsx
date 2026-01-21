@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollReveal from "@/components/ScrollReveal";
 import Image from "next/image";
 import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
@@ -11,21 +12,22 @@ import type { Property } from "@/types/database";
 export default function PropertyDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadProperty() {
       setLoading(true);
-      const data = await getPropertyById(params.id);
+      const data = await getPropertyById(id);
       setProperty(data);
       setLoading(false);
     }
 
     loadProperty();
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -108,9 +110,11 @@ export default function PropertyDetailPage({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-8">
+                  <ScrollReveal>
+                    <div className="space-y-8">
                   {/* Title and Price */}
                   <div>
                     <div className="flex items-start justify-between mb-4">
@@ -234,11 +238,14 @@ export default function PropertyDetailPage({
                       </ul>
                     </div>
                   )}
+                    </div>
+                  </ScrollReveal>
                 </div>
 
                 {/* Contact Sidebar */}
-                <div className="lg:col-span-1">
-                  <div className="bg-white border border-border-gray rounded-button p-6 sticky top-24 space-y-4">
+                <div className="lg:col-span-4">
+                  <ScrollReveal delay={100}>
+                  <div className="bg-white border border-border-gray rounded-card p-6 sticky top-24 space-y-4">
                     <h3 className="text-xl font-semibold">
                       Ready to See This Home?
                     </h3>
@@ -263,15 +270,15 @@ export default function PropertyDetailPage({
                           </a>
                         )}
 
-                        <div className="text-center text-sm text-text-secondary">
+                        <div className="text-center text-sm text-text-secondary my-2">
                           or call
                         </div>
 
                         <a
                           href={`tel:${property.landlord_phone}`}
-                          className="btn-secondary w-full text-center"
+                          className="btn-secondary w-full text-center block"
                         >
-                          {property.landlord_phone}
+                          <span className="truncate">{property.landlord_phone}</span>
                         </a>
 
                         <div className="pt-4 border-t border-border-gray">
@@ -294,6 +301,7 @@ export default function PropertyDetailPage({
                       </div>
                     )}
                   </div>
+                  </ScrollReveal>
                 </div>
               </div>
             </div>

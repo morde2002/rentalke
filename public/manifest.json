@@ -1,0 +1,22 @@
+{
+  "name": "RentalKE - Affordable Rental Homes in Kenya",
+  "short_name": "RentalKE",
+  "description": "Find affordable bedsitters, 1-bedroom, and 2-bedroom rentals in Kenya. No agents. No stress. Just simple.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#003087",
+  "icons": [
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
