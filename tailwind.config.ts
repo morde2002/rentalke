@@ -11,7 +11,7 @@ const config: Config = {
       colors: {
         // Primary colors (Navy)
         'primary-blue': '#003087',
-        'primary-blue-hover': '#004aad', // Slightly lighter navy (subtle)
+        'primary-blue-hover': '#002055', // Darker navy for hover
         'accent-purple': '#513bf3',
         'accent-purple-hover': '#3d28c4',
 
@@ -47,6 +47,7 @@ const config: Config = {
       borderRadius: {
         'button': '1000px', // PayPal-style pill buttons
         'card': '12px',
+        'card-large': '150px', // Less curved than button, more than card
       },
       transitionTimingFunction: {
         'smooth': 'cubic-bezier(0, 0, 0.25, 1)', // PayPal easing

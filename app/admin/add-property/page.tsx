@@ -332,7 +332,7 @@ export default function AddPropertyPage() {
                     value={formData.whatsapp_number}
                     onChange={(e) => updateField("whatsapp_number", e.target.value)}
                     className="input-field"
-                    placeholder="e.g., 254712345678"
+                    placeholder="e.g., 254115588218"
                   />
                   <p className="text-sm text-text-secondary mt-1">
                     Include country code (254 for Kenya)

@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="bg-text-primary text-white">
       <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left mb-12">
           {/* Logo & Description */}
           <div className="md:col-span-2 flex flex-col items-center md:items-start">
             <div className="bg-white rounded-lg p-4 inline-block mb-4">
@@ -19,17 +19,6 @@ export default function Footer() {
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               Find affordable rental homes in Kenya. No agents, no stress. Connect directly with landlords and find your next home in minutes.
-            </p>
-            <p className="text-sm text-gray-500">
-              © 2026 RentalKE. Built by{" "}
-              <a
-                href="https://xeleratedtech.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300 transition-colors"
-              >
-                Xelerated Tech
-              </a>
             </p>
           </div>
 
@@ -78,7 +67,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/254712345678"
+                  href="https://wa.me/254115588218"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors"
@@ -91,6 +80,21 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Copyright - Centered Below */}
+        <div className="text-center">
+          <p className="text-sm text-gray-500">
+            © 2026 RentalKE. Built by{" "}
+            <a
+              href="https://xeleratedtech.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-gray-300 transition-colors"
+            >
+              Xelerated Tech
+            </a>
+          </p>
         </div>
       </div>
     </footer>

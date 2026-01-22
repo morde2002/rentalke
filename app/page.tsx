@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
+import PropertyCardGrid from "@/components/PropertyCardGrid";
+import { getProperties } from "@/lib/properties";
+import type { Property } from "@/types/database";
 import Link from "next/link";
 
 // Available locations - will be expanded later with database
@@ -23,7 +26,21 @@ export default function HomePage() {
   const [searchLocation, setSearchLocation] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [loadingProperties, setLoadingProperties] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load featured properties
+  useEffect(() => {
+    async function loadFeatured() {
+      setLoadingProperties(true);
+      const properties = await getProperties({ available: true });
+      // Get first 3 available properties
+      setFeaturedProperties(properties.slice(0, 3));
+      setLoadingProperties(false);
+    }
+    loadFeatured();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -94,12 +111,13 @@ export default function HomePage() {
 
               {/* Subheadline */}
               <p className="text-xl md:text-2xl text-text-secondary max-w-2xl mx-auto">
-                Affordable rentals in Kenya. No agents. No stress. Just simple.
+                Affordable rentals in Kenya. Direct connections. Real listings. Simple search.
               </p>
 
               {/* Search Box */}
               <div className="mt-12 max-w-2xl mx-auto relative" ref={dropdownRef}>
-              <form onSubmit={handleSearch} className="bg-white rounded-button shadow-lg p-2 flex flex-col sm:flex-row gap-2">
+              {/* Desktop Search - Horizontal Layout */}
+              <form onSubmit={handleSearch} className="hidden sm:flex bg-white rounded-button shadow-lg p-2 gap-2">
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -138,6 +156,47 @@ export default function HomePage() {
                   Show Me Homes
                 </button>
               </form>
+
+              {/* Mobile Search - Vertical Layout */}
+              <form onSubmit={handleSearch} className="sm:hidden space-y-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchLocation}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    onFocus={() => {
+                      if (suggestions.length > 0) setShowDropdown(true);
+                    }}
+                    placeholder="Where do you want to live?"
+                    className="w-full px-6 py-4 text-lg border-none focus:outline-none rounded-button bg-white shadow-lg"
+                  />
+
+                  {/* Dropdown Suggestions */}
+                  {showDropdown && suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border-gray rounded-button shadow-xl z-50 overflow-hidden">
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="w-full px-6 py-3 text-left hover:bg-bg-light transition-colors text-text-primary"
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>{suggestion}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button type="submit" className="btn-primary w-full">
+                  Show Me Homes
+                </button>
+              </form>
             </div>
 
             {/* Trust Indicators */}
@@ -166,28 +225,88 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Properties Section */}
+      <section className="section-padding bg-bg-light">
+        <div className="container-custom">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">
+                Available Now in Mombasa
+              </h2>
+              <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+                Real homes, real prices, real availability. Updated daily.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {loadingProperties ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+              <p className="text-text-secondary mt-4">Loading properties...</p>
+            </div>
+          ) : featuredProperties.length > 0 ? (
+            <>
+              <ScrollReveal delay={100}>
+                <div className={`grid gap-6 mb-8 ${
+                  featuredProperties.length === 1
+                    ? "grid-cols-1 max-w-md mx-auto"
+                    : featuredProperties.length === 2
+                    ? "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto"
+                    : "grid-cols-1 md:grid-cols-3 max-w-6xl mx-auto"
+                }`}>
+                  {featuredProperties.map((property) => (
+                    <PropertyCardGrid
+                      key={property.id}
+                      id={property.id}
+                      title={property.title}
+                      price={property.price}
+                      location={property.city}
+                      neighborhood={property.neighborhood}
+                      type={property.type}
+                      bedrooms={property.bedrooms}
+                      bathroom={property.bathroom}
+                      images={property.images || []}
+                      available={property.available}
+                      whatsappNumber={property.whatsapp_number}
+                    />
+                  ))}
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={200}>
+                <div className="flex justify-center">
+                  <Link href="/search" className="btn-primary">
+                    View All Properties
+                  </Link>
+                </div>
+              </ScrollReveal>
+            </>
+          ) : null}
+        </div>
+      </section>
+
       {/* How It Works Section */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-4">
               How It Works
             </h2>
+            <p className="text-xl text-text-secondary text-center mb-16 max-w-2xl mx-auto">
+              Finding your next home is simple. Connect directly with landlords and move in faster.
+            </p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             {/* Step 1 */}
             <ScrollReveal delay={100}>
               <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary-blue/10 rounded-full flex items-center justify-center">
-                <span className="text-3xl">🔍</span>
-              </div>
-              <div className="w-12 h-12 mx-auto bg-primary-blue text-white rounded-full flex items-center justify-center font-semibold text-xl">
+              <div className="w-16 h-16 mx-auto bg-primary-blue text-white rounded-full flex items-center justify-center font-semibold text-2xl">
                 1
               </div>
-              <h3 className="text-xl font-semibold">Search</h3>
+              <h3 className="text-xl font-semibold">Search Your Area</h3>
               <p className="text-text-secondary">
-                Tell us where you want to live
+                Enter your preferred location - Mombasa, Nairobi, Kisumu, or anywhere in Kenya. Filter by price and house type.
               </p>
               </div>
             </ScrollReveal>
@@ -195,15 +314,12 @@ export default function HomePage() {
             {/* Step 2 */}
             <ScrollReveal delay={200}>
               <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary-blue/10 rounded-full flex items-center justify-center">
-                <span className="text-3xl">👀</span>
-              </div>
-              <div className="w-12 h-12 mx-auto bg-primary-blue text-white rounded-full flex items-center justify-center font-semibold text-xl">
+              <div className="w-16 h-16 mx-auto bg-primary-blue text-white rounded-full flex items-center justify-center font-semibold text-2xl">
                 2
               </div>
-              <h3 className="text-xl font-semibold">Browse</h3>
+              <h3 className="text-xl font-semibold">View Real Listings</h3>
               <p className="text-text-secondary">
-                See photos and prices of real homes
+                Browse verified properties with real photos, actual prices, and accurate availability status updated daily.
               </p>
               </div>
             </ScrollReveal>
@@ -211,16 +327,65 @@ export default function HomePage() {
             {/* Step 3 */}
             <ScrollReveal delay={300}>
               <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary-blue/10 rounded-full flex items-center justify-center">
-                <span className="text-3xl">📱</span>
-              </div>
-              <div className="w-12 h-12 mx-auto bg-primary-blue text-white rounded-full flex items-center justify-center font-semibold text-xl">
+              <div className="w-16 h-16 mx-auto bg-primary-blue text-white rounded-full flex items-center justify-center font-semibold text-2xl">
                 3
               </div>
-              <h3 className="text-xl font-semibold">Contact</h3>
+              <h3 className="text-xl font-semibold">Contact Directly</h3>
               <p className="text-text-secondary">
-                Message the landlord directly on WhatsApp
+                Message landlords instantly via WhatsApp or call them directly. Schedule viewings and move in faster.
               </p>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose RentalKE */}
+      <section className="section-padding bg-bg-light">
+        <div className="container-custom">
+          <ScrollReveal>
+            <h2 className="text-3xl md:text-4xl font-semibold text-center mb-4">
+              Why Choose RentalKE?
+            </h2>
+            <p className="text-xl text-text-secondary text-center mb-16 max-w-2xl mx-auto">
+              We're making rental housing accessible and transparent for everyone in Kenya.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <ScrollReveal delay={100}>
+              <div className="bg-white p-6 rounded-card border border-border-gray">
+                <h3 className="text-lg font-semibold mb-3">Direct Contact</h3>
+                <p className="text-text-secondary text-sm">
+                  Connect directly with landlords via WhatsApp or phone. Simple, fast, and personal.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={150}>
+              <div className="bg-white p-6 rounded-card border border-border-gray">
+                <h3 className="text-lg font-semibold mb-3">Real-Time Updates</h3>
+                <p className="text-text-secondary text-sm">
+                  See only available properties. No more wasting time on houses that are already taken.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <div className="bg-white p-6 rounded-card border border-border-gray">
+                <h3 className="text-lg font-semibold mb-3">Verified Listings</h3>
+                <p className="text-text-secondary text-sm">
+                  All properties are verified with real photos and accurate information. No fake listings.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={250}>
+              <div className="bg-white p-6 rounded-card border border-border-gray">
+                <h3 className="text-lg font-semibold mb-3">Affordable Options</h3>
+                <p className="text-text-secondary text-sm">
+                  Find bedsitters, 1-bedrooms, and 2-bedrooms that fit your budget. Prices you can trust.
+                </p>
               </div>
             </ScrollReveal>
           </div>

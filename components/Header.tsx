@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="bg-white border-b border-border-gray sticky top-0 z-50">
@@ -25,15 +27,31 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
+            {pathname !== "/" && (
+              <Link
+                href="/"
+                className="text-primary-blue hover:text-primary-blue-hover transition-colors"
+              >
+                Home
+              </Link>
+            )}
             <Link
               href="/search"
-              className="text-text-secondary hover:text-text-primary transition-colors"
+              className={`transition-colors ${
+                pathname === "/search"
+                  ? "text-primary-blue font-black"
+                  : "text-primary-blue hover:text-primary-blue-hover"
+              }`}
             >
               Find a Home
             </Link>
             <Link
               href="/landlords"
-              className="text-text-secondary hover:text-text-primary transition-colors"
+              className={`transition-colors ${
+                pathname === "/landlords"
+                  ? "text-primary-blue font-black"
+                  : "text-primary-blue hover:text-primary-blue-hover"
+              }`}
             >
               List Your House
             </Link>
@@ -82,17 +100,34 @@ export default function Header() {
         }`}
       >
         <nav className="container-custom py-4 space-y-4 border-t border-border-gray">
+          {pathname !== "/" && (
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-center py-3 text-primary-blue hover:text-primary-blue-hover hover:bg-bg-light rounded-card transition-colors"
+            >
+              Home
+            </Link>
+          )}
           <Link
             href="/search"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-center py-3 text-text-secondary hover:text-text-primary hover:bg-bg-light rounded-card transition-colors"
+            className={`block text-center py-3 rounded-card transition-colors ${
+              pathname === "/search"
+                ? "text-primary-blue font-black bg-bg-light"
+                : "text-primary-blue hover:text-primary-blue-hover hover:bg-bg-light"
+            }`}
           >
             Find a Home
           </Link>
           <Link
             href="/landlords"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-center py-3 text-text-secondary hover:text-text-primary hover:bg-bg-light rounded-card transition-colors"
+            className={`block text-center py-3 rounded-card transition-colors ${
+              pathname === "/landlords"
+                ? "text-primary-blue font-black bg-bg-light"
+                : "text-primary-blue hover:text-primary-blue-hover hover:bg-bg-light"
+            }`}
           >
             List Your House
           </Link>

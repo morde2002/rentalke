@@ -16,25 +16,32 @@ export default function ScrollReveal({ children, delay = 0, className = "" }: Sc
     if (!element) return;
 
     let timeoutId: NodeJS.Timeout;
+    let debounceTimeout: NodeJS.Timeout;
 
     // Create intersection observer with bidirectional animation
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Element is entering viewport - fade in
-            if (delay > 0) {
-              timeoutId = setTimeout(() => {
+          // Clear any pending debounce to prevent flickering
+          if (debounceTimeout) clearTimeout(debounceTimeout);
+
+          // Add small debounce to prevent rapid toggling at boundaries
+          debounceTimeout = setTimeout(() => {
+            if (entry.isIntersecting) {
+              // Element is entering viewport - fade in
+              if (delay > 0) {
+                timeoutId = setTimeout(() => {
+                  element.classList.add("scroll-reveal-visible");
+                }, delay);
+              } else {
                 element.classList.add("scroll-reveal-visible");
-              }, delay);
+              }
             } else {
-              element.classList.add("scroll-reveal-visible");
+              // Element is leaving viewport - fade out
+              if (timeoutId) clearTimeout(timeoutId);
+              element.classList.remove("scroll-reveal-visible");
             }
-          } else {
-            // Element is leaving viewport - fade out
-            if (timeoutId) clearTimeout(timeoutId);
-            element.classList.remove("scroll-reveal-visible");
-          }
+          }, 50); // 50ms debounce to stabilize boundary detection
         });
       },
       {
@@ -50,6 +57,7 @@ export default function ScrollReveal({ children, delay = 0, className = "" }: Sc
         observer.unobserve(element);
       }
       if (timeoutId) clearTimeout(timeoutId);
+      if (debounceTimeout) clearTimeout(debounceTimeout);
     };
   }, [delay]);
 

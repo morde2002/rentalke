@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import Spinner from "@/components/Spinner";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if already logged in
   useEffect(() => {
@@ -19,18 +21,23 @@ export default function AdminLoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     // Simple password check (for MVP - will improve later)
     // Change this password to whatever you want
     const ADMIN_PASSWORD = "rentalke2026";
 
-    if (password === ADMIN_PASSWORD) {
-      localStorage.setItem("rentalke_admin", "true");
-      router.push("/admin/dashboard");
-    } else {
-      setError("Incorrect password");
-      setPassword("");
-    }
+    // Simulate async operation
+    setTimeout(() => {
+      if (password === ADMIN_PASSWORD) {
+        localStorage.setItem("rentalke_admin", "true");
+        router.push("/admin/dashboard");
+      } else {
+        setError("Incorrect password");
+        setPassword("");
+        setIsLoading(false);
+      }
+    }, 500);
   };
 
   return (
@@ -71,8 +78,19 @@ export default function AdminLoginPage() {
                     )}
                   </div>
 
-                  <button type="submit" className="btn-primary w-full">
-                    Login
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="btn-primary w-full disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Spinner size="sm" color="white" />
+                        <span>Logging in...</span>
+                      </>
+                    ) : (
+                      "Login"
+                    )}
                   </button>
                 </form>
 

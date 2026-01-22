@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
+import Spinner from "@/components/Spinner";
 import { getProperties } from "@/lib/properties";
 import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/database";
@@ -12,6 +13,8 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Check authentication
   useEffect(() => {
@@ -39,6 +42,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleToggleAvailability = async (id: string, currentStatus: boolean) => {
+    setUpdatingId(id);
     const { error } = await supabase
       .from("properties")
       .update({ available: !currentStatus })
@@ -47,13 +51,16 @@ export default function AdminDashboardPage() {
     if (error) {
       console.error("Error updating property:", error);
       alert("Error updating property. Check console for details.");
+      setUpdatingId(null);
     } else {
+      setUpdatingId(null);
       await loadProperties(); // Reload properties
     }
   };
 
   const handleDelete = async (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete "${title}"?`)) {
+      setDeletingId(id);
       const { error } = await supabase
         .from("properties")
         .delete()
@@ -62,7 +69,9 @@ export default function AdminDashboardPage() {
       if (error) {
         console.error("Error deleting property:", error);
         alert("Error deleting property. Check console for details.");
+        setDeletingId(null);
       } else {
+        setDeletingId(null);
         await loadProperties(); // Reload properties
       }
     }
@@ -158,13 +167,21 @@ export default function AdminDashboardPage() {
                       <div className="flex flex-col gap-2">
                         <button
                           onClick={() => handleToggleAvailability(property.id, property.available)}
-                          className={`px-4 py-2 rounded-button text-sm font-medium transition-colors ${
+                          disabled={updatingId === property.id}
+                          className={`px-4 py-2 rounded-button text-sm font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
                             property.available
                               ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
                               : "bg-green-100 text-green-800 hover:bg-green-200"
                           }`}
                         >
-                          {property.available ? "Mark as Occupied" : "Mark as Available"}
+                          {updatingId === property.id ? (
+                            <>
+                              <Spinner size="sm" color="currentColor" />
+                              <span>Updating...</span>
+                            </>
+                          ) : (
+                            property.available ? "Mark as Occupied" : "Mark as Available"
+                          )}
                         </button>
                         <Link
                           href={`/homes/${property.id}`}
@@ -174,9 +191,17 @@ export default function AdminDashboardPage() {
                         </Link>
                         <button
                           onClick={() => handleDelete(property.id, property.title)}
-                          className="px-4 py-2 rounded-button text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                          disabled={deletingId === property.id}
+                          className="px-4 py-2 rounded-button text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                          Delete
+                          {deletingId === property.id ? (
+                            <>
+                              <Spinner size="sm" color="currentColor" />
+                              <span>Deleting...</span>
+                            </>
+                          ) : (
+                            "Delete"
+                          )}
                         </button>
                       </div>
                     </div>

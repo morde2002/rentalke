@@ -39,7 +39,7 @@ export default function SearchPage() {
       <Header />
       <main className="min-h-screen bg-white">
         {/* Search Header */}
-        <section className="bg-white border-b border-border-gray py-8">
+        <section className="bg-white pt-8 pb-4">
           <div className="container-custom">
             <h1 className="text-3xl md:text-4xl font-semibold mb-2">
               Find Your Next Home
@@ -51,7 +51,7 @@ export default function SearchPage() {
         </section>
 
         {/* Filters and Results */}
-        <section className="section-padding">
+        <section className="pt-4 pb-8">
           <div className="container-custom">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Filters Sidebar */}
@@ -194,7 +194,15 @@ export default function SearchPage() {
                   </div>
                 ) : filteredProperties.length > 0 ? (
                   <ScrollReveal>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className={`grid gap-6 ${
+                      filteredProperties.length === 1
+                        ? "grid-cols-1 max-w-md mx-auto"
+                        : filteredProperties.length === 2
+                        ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
+                        : filteredProperties.length === 3
+                        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto"
+                        : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    }`}>
                       {filteredProperties.map((property) => (
                         <PropertyCardGrid
                           key={property.id}
@@ -206,8 +214,9 @@ export default function SearchPage() {
                           type={property.type}
                           bedrooms={property.bedrooms}
                           bathroom={property.bathroom}
-                          image={property.images[0] || ""}
+                          images={property.images || []}
                           available={property.available}
+                          whatsappNumber={property.whatsapp_number}
                         />
                       ))}
                     </div>
