@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Spinner from "./Spinner";
 import VerificationBadges from "./VerificationBadges";
+import StarRating from "./StarRating";
 
 interface PropertyCardGridProps {
   id: string;
@@ -21,6 +22,8 @@ interface PropertyCardGridProps {
   addressVerified?: boolean;
   rentalkeVisited?: boolean;
   isDemo?: boolean;
+  averageRating?: number | null;
+  totalRatings?: number | null;
 }
 
 export default function PropertyCardGrid({
@@ -40,6 +43,8 @@ export default function PropertyCardGrid({
   addressVerified,
   rentalkeVisited,
   isDemo = false,
+  averageRating,
+  totalRatings,
 }: PropertyCardGridProps) {
   const [isWhatsAppLoading, setIsWhatsAppLoading] = useState(false);
   const [isViewLoading, setIsViewLoading] = useState(false);
@@ -193,6 +198,18 @@ export default function PropertyCardGrid({
           <p className="text-sm text-text-secondary mb-3 line-clamp-1">
             {neighborhood}, {location}
           </p>
+
+          {/* Star Rating */}
+          {averageRating !== null && averageRating !== undefined && (
+            <div className="mb-3">
+              <StarRating
+                rating={averageRating}
+                totalRatings={totalRatings || 0}
+                size="sm"
+                showCount={true}
+              />
+            </div>
+          )}
 
           {/* Verification Badges */}
           <div className="mb-3">

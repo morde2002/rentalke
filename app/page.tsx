@@ -277,6 +277,8 @@ export default function HomePage() {
                       addressVerified={property.address_verified}
                       rentalkeVisited={property.rentalke_visited}
                       isDemo={true}
+                      averageRating={property.average_rating}
+                      totalRatings={property.total_ratings}
                     />
                   ))}
                 </div>
@@ -398,6 +400,178 @@ export default function HomePage() {
               </div>
             </ScrollReveal>
           </div>
+        </div>
+      </section>
+
+      {/* Rent Safely Section */}
+      <section className="section-padding bg-white">
+        <div className="container-custom">
+          <ScrollReveal>
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-semibold mb-4">
+                  Rent Safely in Kenya
+                </h2>
+                <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+                  Know the signs of a real rental listing and protect yourself from scammers
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Safe Payment Methods */}
+                <ScrollReveal delay={100}>
+                  <div className="bg-green-50 border-2 border-green-200 rounded-card p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="text-3xl">✅</div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-green-800 mb-2">
+                          Safe Payment Signs
+                        </h3>
+                        <p className="text-sm text-gray-700 mb-4">
+                          Look for these trusted payment methods:
+                        </p>
+                      </div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex gap-2">
+                        <span className="text-green-600 font-bold">•</span>
+                        <span><strong>Paybill Number</strong> - Registered business (safest)</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-green-600 font-bold">•</span>
+                        <span><strong>Till Number</strong> - Verified merchant account</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-green-600 font-bold">•</span>
+                        <span><strong>Tip:</strong> Send Ksh 1 first to verify the business name</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-green-600 font-bold">•</span>
+                        <span>Check M-Pesa confirmation shows correct landlord</span>
+                      </li>
+                    </ul>
+                  </div>
+                </ScrollReveal>
+
+                {/* Warning Signs */}
+                <ScrollReveal delay={200}>
+                  <div className="bg-red-50 border-2 border-red-200 rounded-card p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="text-3xl">⚠️</div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-red-800 mb-2">
+                          Warning Signs
+                        </h3>
+                        <p className="text-sm text-gray-700 mb-4">
+                          Be cautious if you encounter:
+                        </p>
+                      </div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex gap-2">
+                        <span className="text-red-600 font-bold">•</span>
+                        <span><strong>Send Money</strong> requests (personal M-Pesa)</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-red-600 font-bold">•</span>
+                        <span><strong>Pochi la Biashara</strong> without verification</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-red-600 font-bold">•</span>
+                        <span>Asking for deposit <strong>before viewing</strong></span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-red-600 font-bold">•</span>
+                        <span>Prices unrealistic for the area (too cheap)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </ScrollReveal>
+
+                {/* What to Check */}
+                <ScrollReveal delay={300}>
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-card p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="text-3xl">🔍</div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-blue-800 mb-2">
+                          What to Check During Viewing
+                        </h3>
+                      </div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex gap-2">
+                        <span className="text-blue-600 font-bold">•</span>
+                        <span><strong>Water:</strong> Piped to house (not jerricans)</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-blue-600 font-bold">•</span>
+                        <span><strong>Electricity:</strong> Check the meter/token system</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-blue-600 font-bold">•</span>
+                        <span><strong>Security:</strong> Gated compound or open access?</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-blue-600 font-bold">•</span>
+                        <span>Meet at the <strong>actual property</strong> location</span>
+                      </li>
+                    </ul>
+                  </div>
+                </ScrollReveal>
+
+                {/* Our Commitment */}
+                <ScrollReveal delay={400}>
+                  <div className="bg-purple-50 border-2 border-purple-200 rounded-card p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="text-3xl">🛡️</div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-purple-800 mb-2">
+                          Our Verification Process
+                        </h3>
+                      </div>
+                    </div>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex gap-2">
+                        <span className="text-purple-600 font-bold">•</span>
+                        <span>We verify landlord phone numbers</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-purple-600 font-bold">•</span>
+                        <span>Our team physically visits properties</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-purple-600 font-bold">•</span>
+                        <span>We confirm property addresses</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-purple-600 font-bold">•</span>
+                        <span>Look for verification badges on listings</span>
+                      </li>
+                    </ul>
+                  </div>
+                </ScrollReveal>
+              </div>
+
+              {/* Report Section */}
+              <ScrollReveal delay={500}>
+                <div className="mt-8 bg-yellow-50 border-2 border-yellow-200 rounded-card p-6 text-center">
+                  <p className="text-gray-800">
+                    <span className="font-semibold text-lg">🚨 Suspicious listing or scam attempt?</span>
+                    <br />
+                    <a
+                      href="https://wa.me/254115588218?text=I want to report a suspicious listing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-blue hover:underline font-semibold text-lg mt-2 inline-block"
+                    >
+                      Report it immediately on WhatsApp
+                    </a>
+                  </p>
+                </div>
+              </ScrollReveal>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

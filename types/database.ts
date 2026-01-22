@@ -33,6 +33,23 @@ export interface Property {
   landlord_id_number?: string | null;
   landlord_alt_phone?: string | null;
   landlord_physical_address?: string | null;
+  // Payment verification
+  payment_method?: string | null; // 'paybill', 'till_number', 'send_money', 'pochi'
+  paybill_number?: string | null;
+  till_number?: string | null;
+  business_name?: string | null;
+  // Water details
+  water_source?: string | null; // 'piped_to_house', 'jerricans', 'borehole'
+  water_payment?: string | null; // 'included', 'separate_monthly', 'per_jerrican'
+  // Electricity details
+  electricity_type?: string | null; // 'tokens', 'monthly_bill', 'included'
+  electricity_payment?: string | null; // 'tenant', 'landlord'
+  // Security
+  security_type?: string | null; // 'gated_compound', 'open_access', 'watchman', 'gate_and_watchman'
+  security_details?: string | null;
+  // Ratings
+  average_rating?: number | null; // Average star rating (1-5)
+  total_ratings?: number | null; // Total number of ratings
 }
 
 export interface PropertyInsert {

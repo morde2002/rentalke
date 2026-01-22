@@ -8,6 +8,8 @@ import Spinner from "@/components/Spinner";
 import ImageCarousel from "@/components/ImageCarousel";
 import SafetyTips from "@/components/SafetyTips";
 import VerificationBadges from "@/components/VerificationBadges";
+import PropertyHighlights from "@/components/PropertyHighlights";
+import StarRating from "@/components/StarRating";
 import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
 import type { Property } from "@/types/database";
@@ -125,6 +127,17 @@ export default function PropertyDetailPage({
                         <p className="text-xl text-text-secondary mb-3">
                           {property.neighborhood}, {property.city}
                         </p>
+                        {/* Star Rating */}
+                        {property.average_rating !== null && property.average_rating !== undefined && (
+                          <div className="mb-3">
+                            <StarRating
+                              rating={property.average_rating}
+                              totalRatings={property.total_ratings || 0}
+                              size="lg"
+                              showCount={true}
+                            />
+                          </div>
+                        )}
                         <VerificationBadges
                           phoneVerified={property.phone_verified}
                           idVerified={property.id_verified}
@@ -161,6 +174,20 @@ export default function PropertyDetailPage({
                       {property.description}
                     </p>
                   </div>
+
+                  {/* Property Highlights */}
+                  <PropertyHighlights
+                    paymentMethod={property.payment_method}
+                    paybillNumber={property.paybill_number}
+                    tillNumber={property.till_number}
+                    businessName={property.business_name}
+                    waterSource={property.water_source}
+                    waterPayment={property.water_payment}
+                    electricityType={property.electricity_type}
+                    electricityPayment={property.electricity_payment}
+                    securityType={property.security_type}
+                    securityDetails={property.security_details}
+                  />
 
                   {/* Details */}
                   <div>

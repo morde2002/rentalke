@@ -166,7 +166,7 @@ export default function TermsPage() {
                       Questions about these terms? Contact us:
                     </p>
                     <ul className="space-y-2 mt-3">
-                      <li>Email: <a href="mailto:rentalke@gmail.com" className="text-primary-blue hover:underline">rentalke@gmail.com</a></li>
+                      <li>Email: <a href="mailto:info.rentalke@gmail.com" className="text-primary-blue hover:underline">info.rentalke@gmail.com</a></li>
                       <li>Phone: <a href="tel:+254115588218" className="text-primary-blue hover:underline">+254 115 588 218</a></li>
                       <li>WhatsApp: <a href="https://wa.me/254115588218" target="_blank" rel="noopener noreferrer" className="text-primary-blue hover:underline">Message Us</a></li>
                     </ul>

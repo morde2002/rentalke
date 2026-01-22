@@ -148,8 +148,8 @@ export default function AboutPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-text-secondary">
                     <div>
                       <p className="font-semibold text-text-primary mb-1">Email</p>
-                      <a href="mailto:rentalke@gmail.com" className="text-primary-blue hover:underline">
-                        rentalke@gmail.com
+                      <a href="mailto:info.rentalke@gmail.com" className="text-primary-blue hover:underline">
+                        info.rentalke@gmail.com
                       </a>
                     </div>
                     <div>

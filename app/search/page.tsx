@@ -223,6 +223,8 @@ export default function SearchPage() {
                           addressVerified={property.address_verified}
                           rentalkeVisited={property.rentalke_visited}
                           isDemo={true}
+                          averageRating={property.average_rating}
+                          totalRatings={property.total_ratings}
                         />
                       ))}
                     </div>
