@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import Spinner from "@/components/Spinner";
 import ImageCarousel from "@/components/ImageCarousel";
+import SafetyTips from "@/components/SafetyTips";
+import VerificationBadges from "@/components/VerificationBadges";
 import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
 import type { Property } from "@/types/database";
@@ -120,9 +122,15 @@ export default function PropertyDetailPage({
                         <h1 className="text-3xl md:text-4xl font-semibold mb-2">
                           {property.title}
                         </h1>
-                        <p className="text-xl text-text-secondary">
+                        <p className="text-xl text-text-secondary mb-3">
                           {property.neighborhood}, {property.city}
                         </p>
+                        <VerificationBadges
+                          phoneVerified={property.phone_verified}
+                          idVerified={property.id_verified}
+                          addressVerified={property.address_verified}
+                          rentalkeVisited={property.rentalke_visited}
+                        />
                       </div>
                       {property.available ? (
                         <span className="badge-available">
@@ -311,6 +319,13 @@ export default function PropertyDetailPage({
                       </div>
                     )}
                   </div>
+                  </ScrollReveal>
+
+                  {/* Safety Tips */}
+                  <ScrollReveal delay={200}>
+                    <div className="mt-6">
+                      <SafetyTips />
+                    </div>
                   </ScrollReveal>
                 </div>
               </div>

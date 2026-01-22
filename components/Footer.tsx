@@ -50,6 +50,14 @@ export default function Footer() {
                   List Your Property
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  About Us
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -59,10 +67,18 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="mailto:info@rentalke.com"
+                  href="mailto:rentalke@gmail.com"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  info@rentalke.com
+                  rentalke@gmail.com
+                </a>
+              </li>
+              <li>
+                <a
+                  href="tel:+254115588218"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  +254 115 588 218
                 </a>
               </li>
               <li>
@@ -83,7 +99,16 @@ export default function Footer() {
         </div>
 
         {/* Copyright - Centered Below */}
-        <div className="text-center">
+        <div className="text-center space-y-3">
+          <div className="flex items-center justify-center gap-4 text-sm">
+            <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+            <span className="text-gray-600">•</span>
+            <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+          </div>
           <p className="text-sm text-gray-500">
             © 2026 RentalKE. Built by{" "}
             <a

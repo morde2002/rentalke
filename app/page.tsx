@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DemoBanner from "@/components/DemoBanner";
 import ScrollReveal from "@/components/ScrollReveal";
 import PropertyCardGrid from "@/components/PropertyCardGrid";
 import { getProperties } from "@/lib/properties";
@@ -233,8 +234,11 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-semibold mb-4">
                 Available Now in Mombasa
               </h2>
-              <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+              <p className="text-xl text-text-secondary max-w-2xl mx-auto mb-3">
                 Real homes, real prices, real availability. Updated daily.
+              </p>
+              <p className="text-base text-blue-600 font-semibold">
+                Sample listings shown • Actively partnering with landlords
               </p>
             </div>
           </ScrollReveal>
@@ -268,6 +272,11 @@ export default function HomePage() {
                       images={property.images || []}
                       available={property.available}
                       whatsappNumber={property.whatsapp_number}
+                      phoneVerified={property.phone_verified}
+                      idVerified={property.id_verified}
+                      addressVerified={property.address_verified}
+                      rentalkeVisited={property.rentalke_visited}
+                      isDemo={true}
                     />
                   ))}
                 </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DemoBanner from "@/components/DemoBanner";
 import ScrollReveal from "@/components/ScrollReveal";
 import PropertyCardGrid from "@/components/PropertyCardGrid";
 import { getProperties } from "@/lib/properties";
@@ -217,6 +218,11 @@ export default function SearchPage() {
                           images={property.images || []}
                           available={property.available}
                           whatsappNumber={property.whatsapp_number}
+                          phoneVerified={property.phone_verified}
+                          idVerified={property.id_verified}
+                          addressVerified={property.address_verified}
+                          rentalkeVisited={property.rentalke_visited}
+                          isDemo={true}
                         />
                       ))}
                     </div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Spinner from "./Spinner";
+import VerificationBadges from "./VerificationBadges";
 
 interface PropertyCardGridProps {
   id: string;
@@ -15,6 +16,11 @@ interface PropertyCardGridProps {
   images: string[];
   available: boolean;
   whatsappNumber?: string | null;
+  phoneVerified?: boolean;
+  idVerified?: boolean;
+  addressVerified?: boolean;
+  rentalkeVisited?: boolean;
+  isDemo?: boolean;
 }
 
 export default function PropertyCardGrid({
@@ -29,6 +35,11 @@ export default function PropertyCardGrid({
   images,
   available,
   whatsappNumber,
+  phoneVerified,
+  idVerified,
+  addressVerified,
+  rentalkeVisited,
+  isDemo = false,
 }: PropertyCardGridProps) {
   const [isWhatsAppLoading, setIsWhatsAppLoading] = useState(false);
   const [isViewLoading, setIsViewLoading] = useState(false);
@@ -49,6 +60,28 @@ export default function PropertyCardGrid({
     }
   };
 
+  // Auto-slide effect for property cards
+  useEffect(() => {
+    if (!images || images.length <= 1) return; // Don't auto-slide if only one image or no images
+
+    const interval = setInterval(() => {
+      goToNextImage();
+    }, 3000); // 3 seconds
+
+    return () => clearInterval(interval);
+  }, [currentImageIndex, images]);
+
+  const goToNextImage = () => {
+    if (isTransitioning || !images || images.length === 0) return;
+    const nextIdx = currentImageIndex === images.length - 1 ? 0 : currentImageIndex + 1;
+    setNextImageIndex(nextIdx);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentImageIndex(nextIdx);
+      setIsTransitioning(false);
+    }, 1000); // Increased to 1000ms for smoother transition
+  };
+
   const goToImage = (index: number) => {
     if (isTransitioning || index === currentImageIndex || !images || images.length === 0) return;
     setNextImageIndex(index);
@@ -56,7 +89,7 @@ export default function PropertyCardGrid({
     setTimeout(() => {
       setCurrentImageIndex(index);
       setIsTransitioning(false);
-    }, 600);
+    }, 1000); // Increased to 1000ms for smoother transition
   };
 
   return (
@@ -78,7 +111,7 @@ export default function PropertyCardGrid({
                     src={image}
                     alt={`${title} - Image ${index + 1}`}
                     fill
-                    className={`object-cover absolute inset-0 transition-opacity duration-[600ms] ease-in-out ${
+                    className={`object-cover absolute inset-0 transition-opacity duration-[1000ms] ease-in-out ${
                       isCurrent && isTransitioning
                         ? 'opacity-0'
                         : isCurrent
@@ -92,7 +125,7 @@ export default function PropertyCardGrid({
               })}
               {/* Image Counter */}
               {images.length > 1 && (
-                <div className="absolute top-3 left-3 bg-black/60 text-white px-2 py-1 rounded-full text-xs transition-all duration-300">
+                <div className="absolute top-3 left-3 bg-black/60 text-white px-2 py-1 rounded-full text-xs transition-all duration-500">
                   {(isTransitioning ? nextImageIndex : currentImageIndex) + 1} / {images.length}
                 </div>
               )}
@@ -107,7 +140,7 @@ export default function PropertyCardGrid({
                         e.stopPropagation();
                         goToImage(index);
                       }}
-                      className={`w-1.5 h-1.5 rounded-full transition-all duration-600 ${
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-[1000ms] ease-in-out ${
                         index === (isTransitioning ? nextImageIndex : currentImageIndex)
                           ? "bg-white w-6"
                           : "bg-white/50 hover:bg-white/75"
@@ -123,6 +156,13 @@ export default function PropertyCardGrid({
               <span className="text-4xl">🏠</span>
             </div>
           )}
+          {/* Demo Badge */}
+          {isDemo && (
+            <div className="absolute top-3 left-3 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
+              DEMO
+            </div>
+          )}
+
           {/* Availability Badge */}
           {available ? (
             <div className="absolute top-3 right-3 badge-available text-xs">
@@ -153,6 +193,17 @@ export default function PropertyCardGrid({
           <p className="text-sm text-text-secondary mb-3 line-clamp-1">
             {neighborhood}, {location}
           </p>
+
+          {/* Verification Badges */}
+          <div className="mb-3">
+            <VerificationBadges
+              phoneVerified={phoneVerified}
+              idVerified={idVerified}
+              addressVerified={addressVerified}
+              rentalkeVisited={rentalkeVisited}
+              size="sm"
+            />
+          </div>
 
           {/* Features */}
           <div className="flex flex-wrap gap-3 text-xs text-text-secondary mb-4">

@@ -22,6 +22,17 @@ export interface Property {
   images: string[];
   features: string[];
   nearby_places: string[];
+  // Verification fields
+  phone_verified?: boolean;
+  id_verified?: boolean;
+  address_verified?: boolean;
+  rentalke_visited?: boolean;
+  verified_at?: string | null;
+  verified_by?: string | null;
+  // Private landlord details (not displayed publicly)
+  landlord_id_number?: string | null;
+  landlord_alt_phone?: string | null;
+  landlord_physical_address?: string | null;
 }
 
 export interface PropertyInsert {

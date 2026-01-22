@@ -78,7 +78,7 @@ export default function ImageCarousel({ images, title, video, autoSlideInterval 
   };
 
   return (
-    <div className="relative aspect-[16/9] bg-bg-light rounded-[20px] overflow-hidden group">
+    <div className="relative aspect-[21/9] bg-bg-light rounded-[20px] overflow-hidden group">
       {/* Main Image/Video Display */}
       <div className="relative w-full h-full">
         {/* All images rendered but only visible one shows */}
