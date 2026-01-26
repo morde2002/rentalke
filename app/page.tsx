@@ -2,12 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DemoBanner from "@/components/DemoBanner";
 import ScrollReveal from "@/components/ScrollReveal";
 import PropertyCardGrid from "@/components/PropertyCardGrid";
 import { getProperties } from "@/lib/properties";
+import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
 import type { Property } from "@/types/database";
 import Link from "next/link";
 
@@ -98,6 +100,22 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Structured Data for SEO */}
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateOrganizationSchema())
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateWebsiteSchema())
+          }}
+        />
+      </Head>
+
       <Header />
       <main className="min-h-screen">
         {/* Hero Section */}

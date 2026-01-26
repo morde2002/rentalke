@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="md:col-span-2 flex flex-col items-center md:items-start">
             <div className="bg-white rounded-lg p-4 inline-block mb-4">
               <Image
-                src="/images/rentalkelogo.png"
+                src="/images/rentalke-logo.png"
                 alt="RentalKE"
                 width={200}
                 height={56}

@@ -75,8 +75,66 @@ export default function PropertyDetailPage({
     );
   }
 
+  // Generate structured data for SEO (Schema.org JSON-LD)
+  const generateStructuredData = () => {
+    if (!property) return null;
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "RealEstateListing",
+      "name": property.title,
+      "description": property.description || `${property.type} for rent in ${property.neighborhood}, ${property.city}`,
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.vercel.app'}/homes/${property.id}`,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": property.neighborhood,
+        "addressRegion": property.city,
+        "addressCountry": "KE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "addressCountry": "KE"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": property.price,
+        "priceCurrency": "KES",
+        "availability": property.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": property.price,
+          "priceCurrency": "KES",
+          "unitText": "MONTH"
+        }
+      },
+      "numberOfRooms": property.bedrooms,
+      "floorSize": {
+        "@type": "QuantitativeValue",
+        "value": property.type
+      },
+      "image": property.images && property.images.length > 0 ? property.images : undefined,
+      "aggregateRating": property.average_rating ? {
+        "@type": "AggregateRating",
+        "ratingValue": property.average_rating,
+        "reviewCount": property.total_ratings || 0,
+        "bestRating": "5",
+        "worstRating": "1"
+      } : undefined
+    };
+  };
+
   return (
     <>
+      {/* JSON-LD Structured Data for SEO */}
+      {property && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateStructuredData())
+          }}
+        />
+      )}
+
       <Header />
       <main className="min-h-screen bg-white">
         {/* Back Button */}
