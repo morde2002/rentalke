@@ -20,6 +20,7 @@ export interface Property {
   landlord_phone: string;
   whatsapp_number: string | null;
   images: string[];
+  video_url?: string | null;
   features: string[];
   nearby_places: string[];
   // Verification fields

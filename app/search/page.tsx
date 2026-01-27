@@ -12,9 +12,21 @@ import type { Property } from "@/types/database";
 export default function SearchPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000]);
   const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("all");
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const propertiesPerPage = 20;
+
+  // Available cities and neighborhoods
+  const cities = ["Mombasa", "Nairobi", "Kisumu"];
+  const neighborhoods: Record<string, string[]> = {
+    Mombasa: ["Bamburi", "Nyali", "Likoni", "Changamwe", "Mtongwe", "Vijiweni"],
+    Nairobi: ["Kasarani", "Umoja", "Kahawa", "Ruaka", "Kitengela"],
+    Kisumu: ["Kondele", "Nyalenda", "Migosi", "Mamboleo"],
+  };
 
   // Load properties from database
   useEffect(() => {
@@ -26,14 +38,45 @@ export default function SearchPage() {
         type: selectedType,
         available: showOnlyAvailable ? true : undefined,
       });
+
       setProperties(data);
       setLoading(false);
     }
 
     loadProperties();
-  }, [priceRange, selectedType, showOnlyAvailable]);
+  }, [priceRange, selectedType, showOnlyAvailable, selectedCity, selectedNeighborhood]);
 
-  const filteredProperties = properties;
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [priceRange, selectedType, showOnlyAvailable, selectedCity, selectedNeighborhood]);
+
+  // Reset neighborhood when city changes
+  useEffect(() => {
+    setSelectedNeighborhood("all");
+  }, [selectedCity]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  // Filter properties by location
+  const filteredProperties = properties.filter((property) => {
+    if (selectedCity !== "all" && property.city !== selectedCity) return false;
+    if (selectedNeighborhood !== "all" && property.neighborhood !== selectedNeighborhood) return false;
+    return true;
+  });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProperties.length / propertiesPerPage);
+  const startIndex = (currentPage - 1) * propertiesPerPage;
+  const endIndex = startIndex + propertiesPerPage;
+  const currentProperties = filteredProperties.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <>
@@ -46,7 +89,7 @@ export default function SearchPage() {
               Find Your Next Home
             </h1>
             <p className="text-text-secondary">
-              {filteredProperties.length} homes found in Mombasa
+              {loading ? 'Loading...' : `Showing ${startIndex + 1}-${Math.min(endIndex, filteredProperties.length)} of ${filteredProperties.length} homes${selectedCity !== "all" ? ` in ${selectedCity}` : selectedNeighborhood !== "all" ? ` in ${selectedNeighborhood}` : " in Kenya"}`}
             </p>
           </div>
         </section>
@@ -54,23 +97,62 @@ export default function SearchPage() {
         {/* Filters and Results */}
         <section className="pt-4 pb-8">
           <div className="container-custom">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               {/* Filters Sidebar */}
-              <aside className="lg:col-span-3 space-y-6">
-                <div className="bg-white border border-border-gray rounded-card p-6 space-y-6">
+              <aside className="lg:col-span-3">
+                <div className="lg:sticky lg:top-20 space-y-3">
+                <div className="bg-white border border-border-gray rounded-card p-3 space-y-3">
+                  {/* Location Filter */}
+                  <div>
+                    <h3 className="font-semibold text-text-primary mb-2 text-sm">
+                      Location
+                    </h3>
+                    <div className="space-y-2">
+                      {/* City Filter */}
+                      <select
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        className="w-full px-2 py-1.5 text-xs border border-border-gray rounded-card focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                      >
+                        <option value="all">All Cities</option>
+                        {cities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Neighborhood Filter - only show if city is selected */}
+                      {selectedCity !== "all" && (
+                        <select
+                          value={selectedNeighborhood}
+                          onChange={(e) => setSelectedNeighborhood(e.target.value)}
+                          className="w-full px-2 py-1.5 text-xs border border-border-gray rounded-card focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                        >
+                          <option value="all">All Neighborhoods</option>
+                          {neighborhoods[selectedCity]?.map((neighborhood) => (
+                            <option key={neighborhood} value={neighborhood}>
+                              {neighborhood}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Availability Filter */}
                   <div>
-                    <h3 className="font-semibold text-text-primary mb-4">
+                    <h3 className="font-semibold text-text-primary mb-2 text-sm">
                       Availability
                     </h3>
-                    <label className="flex items-center gap-3 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={showOnlyAvailable}
                         onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-                        className="w-5 h-5 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
                       />
-                      <span className="text-text-secondary">
+                      <span className="text-text-secondary text-xs">
                         Show only available
                       </span>
                     </label>
@@ -78,11 +160,11 @@ export default function SearchPage() {
 
                   {/* Price Range */}
                   <div>
-                    <h3 className="font-semibold text-text-primary mb-4">
+                    <h3 className="font-semibold text-text-primary mb-2 text-sm">
                       Price Range
                     </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
                         <span className="text-text-secondary">Min</span>
                         <span className="font-medium">
                           Ksh {priceRange[0].toLocaleString()}
@@ -99,7 +181,7 @@ export default function SearchPage() {
                         }
                         className="w-full"
                       />
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between text-xs">
                         <span className="text-text-secondary">Max</span>
                         <span className="font-medium">
                           Ksh {priceRange[1].toLocaleString()}
@@ -121,53 +203,53 @@ export default function SearchPage() {
 
                   {/* House Type */}
                   <div>
-                    <h3 className="font-semibold text-text-primary mb-4">
+                    <h3 className="font-semibold text-text-primary mb-2 text-sm">
                       House Type
                     </h3>
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-3 cursor-pointer">
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name="type"
                           value="all"
                           checked={selectedType === "all"}
                           onChange={(e) => setSelectedType(e.target.value)}
-                          className="w-5 h-5 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
                         />
-                        <span className="text-text-secondary">All Types</span>
+                        <span className="text-text-secondary text-xs">All Types</span>
                       </label>
-                      <label className="flex items-center gap-3 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name="type"
                           value="Bedsitter"
                           checked={selectedType === "Bedsitter"}
                           onChange={(e) => setSelectedType(e.target.value)}
-                          className="w-5 h-5 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
                         />
-                        <span className="text-text-secondary">Bedsitter</span>
+                        <span className="text-text-secondary text-xs">Bedsitter</span>
                       </label>
-                      <label className="flex items-center gap-3 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name="type"
                           value="1 Bedroom"
                           checked={selectedType === "1 Bedroom"}
                           onChange={(e) => setSelectedType(e.target.value)}
-                          className="w-5 h-5 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
                         />
-                        <span className="text-text-secondary">1 Bedroom</span>
+                        <span className="text-text-secondary text-xs">1 Bedroom</span>
                       </label>
-                      <label className="flex items-center gap-3 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name="type"
                           value="2 Bedroom"
                           checked={selectedType === "2 Bedroom"}
                           onChange={(e) => setSelectedType(e.target.value)}
-                          className="w-5 h-5 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
                         />
-                        <span className="text-text-secondary">2 Bedroom</span>
+                        <span className="text-text-secondary text-xs">2 Bedroom</span>
                       </label>
                     </div>
                   </div>
@@ -177,12 +259,15 @@ export default function SearchPage() {
                     onClick={() => {
                       setPriceRange([0, 20000]);
                       setSelectedType("all");
+                      setSelectedCity("all");
+                      setSelectedNeighborhood("all");
                       setShowOnlyAvailable(true);
                     }}
-                    className="w-full text-primary-blue hover:text-primary-blue-hover font-medium text-sm transition-colors"
+                    className="w-full text-primary-blue hover:text-primary-blue-hover font-medium text-xs transition-colors"
                   >
                     Clear All Filters
                   </button>
+                </div>
                 </div>
               </aside>
 
@@ -194,17 +279,10 @@ export default function SearchPage() {
                     <p className="text-text-secondary">Loading properties...</p>
                   </div>
                 ) : filteredProperties.length > 0 ? (
-                  <ScrollReveal>
-                    <div className={`grid gap-6 ${
-                      filteredProperties.length === 1
-                        ? "grid-cols-1 max-w-md mx-auto"
-                        : filteredProperties.length === 2
-                        ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
-                        : filteredProperties.length === 3
-                        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto"
-                        : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                    }`}>
-                      {filteredProperties.map((property) => (
+                  <>
+                    <ScrollReveal>
+                      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {currentProperties.map((property) => (
                         <PropertyCardGrid
                           key={property.id}
                           id={property.id}
@@ -229,6 +307,73 @@ export default function SearchPage() {
                       ))}
                     </div>
                   </ScrollReveal>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex flex-col items-center gap-4">
+                      {/* Page info */}
+                      <p className="text-sm text-text-secondary">
+                        Page {currentPage} of {totalPages}
+                      </p>
+
+                      {/* Pagination controls */}
+                      <div className="flex items-center gap-2">
+                        {/* Previous button */}
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="px-3 py-2 border border-border-gray rounded-card text-sm font-medium hover:bg-bg-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          ← Previous
+                        </button>
+
+                        {/* Page numbers */}
+                        <div className="flex gap-1">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                            // Show first page, last page, current page, and pages around current
+                            const showPage =
+                              page === 1 ||
+                              page === totalPages ||
+                              (page >= currentPage - 1 && page <= currentPage + 1);
+
+                            const showEllipsis =
+                              (page === currentPage - 2 && currentPage > 3) ||
+                              (page === currentPage + 2 && currentPage < totalPages - 2);
+
+                            if (showEllipsis) {
+                              return <span key={page} className="px-2 text-text-secondary">...</span>;
+                            }
+
+                            if (!showPage) return null;
+
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`px-3 py-2 rounded-card text-sm font-medium transition-colors ${
+                                  page === currentPage
+                                    ? 'bg-primary-blue text-white'
+                                    : 'border border-border-gray hover:bg-bg-light'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Next button */}
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-2 border border-border-gray rounded-card text-sm font-medium hover:bg-bg-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Next →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  </>
                 ) : (
                   <div className="text-center py-16">
                     <div className="text-6xl mb-4">🏠</div>

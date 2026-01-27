@@ -11,40 +11,57 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.com'),
   title: {
-    default: "RentalKE - Find Verified Rental Houses in Kenya | Affordable Bedsitters & 1 Bedroom",
-    template: "%s | RentalKE - Affordable Rentals Kenya"
+    default: "Houses & Apartments For Rent in Mombasa, Nairobi, Kenya | RentalKE",
+    template: "%s | RentalKE - Verified Rental Houses Kenya"
   },
-  description: "Find verified rental houses in Kenya. Bedsitters from Ksh 5,000/month in Mombasa, Nairobi & more. Direct landlord contact, no agent fees. Real photos, real prices, real availability.",
+  description: "353+ Houses & Apartments For Rent in Mombasa, Nairobi, Kenya. Bedsitters from KSh 5,000/month. 1 Bedroom, 2 Bedroom. Direct landlord contact, no agents. Real photos, verified listings, updated daily.",
   keywords: [
-    // Primary keywords
+    // Primary keywords with price
     "rental houses Kenya",
-    "houses for rent Kenya",
+    "houses for rent Kenya from KSh 5000",
     "bedsitter Kenya",
     "affordable rentals Kenya",
     "cheap houses for rent Kenya",
-    // Mombasa keywords
+    "apartments for rent Kenya",
+    // Mombasa primary
     "rental houses Mombasa",
-    "bedsitter Mombasa",
     "houses for rent Mombasa",
+    "bedsitter Mombasa",
+    "apartments Mombasa",
     "affordable rentals Mombasa",
     "1 bedroom Mombasa",
-    // Neighborhood keywords
+    "2 bedroom Mombasa",
+    "houses for rent in Mombasa",
+    "bedsitters in Mombasa",
+    // Nairobi keywords
+    "rental houses Nairobi",
+    "bedsitter Nairobi",
+    "houses for rent Nairobi",
+    "affordable rentals Nairobi",
+    "1 bedroom Nairobi",
+    // Mombasa neighborhoods
     "bedsitter Nyali",
-    "rental houses Vijiweni",
-    "houses for rent Likoni",
+    "houses for rent Nyali",
+    "rental houses Bamburi",
     "bedsitter Bamburi",
-    "rental houses Changamwe",
+    "houses for rent Likoni",
+    "rental houses Vijiweni",
+    "houses for rent Changamwe",
+    "bedsitter Mtongwe",
     // Trust keywords
     "verified landlords Kenya",
     "no agent rental houses",
     "direct landlord contact Kenya",
     "safe rental listings Kenya",
+    "trusted landlords Kenya",
+    "verified property listings Kenya",
     // Swahili keywords
     "nyumba za kupanga Kenya",
     "nyumba za kupanga Mombasa",
     "bedsitter bei nafuu",
+    "nyumba za kupanga Nairobi",
   ],
   authors: [{ name: "RentalKE" }],
   creator: "RentalKE",
@@ -58,13 +75,13 @@ export const metadata: Metadata = {
   // No need to specify manually
   manifest: "/manifest.json",
   openGraph: {
-    title: "RentalKE - Find Verified Rental Houses in Kenya",
-    description: "Find verified bedsitters & 1 bedroom rentals from Ksh 5,000/month in Mombasa, Nairobi. Direct landlord contact, no agent fees. Real photos, verified listings.",
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.vercel.app',
+    title: "Houses & Apartments For Rent in Mombasa, Nairobi, Kenya | RentalKE",
+    description: "353+ Houses & Apartments For Rent in Mombasa, Nairobi, Kenya. Bedsitters from KSh 5,000/month. 1 Bedroom, 2 Bedroom. Direct landlord contact, no agents. Real photos, verified listings, updated daily.",
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.com',
     siteName: "RentalKE",
     images: [
       {
-        url: "/og-image.jpg", // We'll create this
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "RentalKE - Affordable Rental Houses in Kenya"
@@ -75,9 +92,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RentalKE - Find Verified Rental Houses in Kenya",
-    description: "Bedsitters & 1 bedroom rentals from Ksh 5,000/month. Direct landlord contact, no agent fees. Mombasa, Nairobi & more.",
-    images: ["/og-image.jpg"],
+    title: "Houses & Apartments For Rent in Mombasa, Nairobi, Kenya | RentalKE",
+    description: "353+ Houses & Apartments For Rent in Mombasa, Nairobi, Kenya. Bedsitters from KSh 5,000/month. Direct landlord contact, no agents. Real photos, verified listings.",
+    images: ["/og-image.png"],
     creator: "@rentalke", // Update with your actual Twitter handle
   },
   robots: {
@@ -95,7 +112,7 @@ export const metadata: Metadata = {
     google: 'your-google-verification-code', // Add after setting up Google Search Console
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.vercel.app',
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.com',
   },
   category: 'Real Estate',
 };

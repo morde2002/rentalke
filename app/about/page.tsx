@@ -2,6 +2,24 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us - Our Mission",
+  description: "Learn about RentalKE's mission to make affordable housing accessible to everyone in Kenya. We connect tenants directly with verified landlords in Mombasa, Nairobi, and across Kenya. No agents, no hidden fees.",
+  keywords: [
+    "about RentalKE",
+    "affordable housing Kenya",
+    "rental platform Kenya",
+    "verified landlords Kenya",
+    "no agent rentals Kenya",
+  ],
+  openGraph: {
+    title: "About RentalKE - Making Housing Affordable for Everyone",
+    description: "Connecting Kenyan renters with verified landlords. No agents, no hidden fees, just honest rental listings.",
+    type: "website",
+  },
+};
 
 export default function AboutPage() {
   return (

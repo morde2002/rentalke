@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import DemoBanner from "@/components/DemoBanner";
 import ScrollReveal from "@/components/ScrollReveal";
 import PropertyCardGrid from "@/components/PropertyCardGrid";
+import VerificationBadges from "@/components/VerificationBadges";
+import StarRating from "@/components/StarRating";
 import { getProperties } from "@/lib/properties";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
 import type { Property } from "@/types/database";
@@ -31,15 +33,64 @@ export default function HomePage() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [loadingProperties, setLoadingProperties] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentPropertyIndex, setCurrentPropertyIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Reset image index when property changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [currentPropertyIndex]);
+
+  // Auto-scroll image carousel inside each property card
+  useEffect(() => {
+    if (featuredProperties.length === 0) return;
+    const currentProperty = featuredProperties[currentPropertyIndex % featuredProperties.length];
+    if (!currentProperty || currentProperty.images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex(prev =>
+        prev === currentProperty.images.length - 1 ? 0 : prev + 1
+      );
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [currentPropertyIndex, featuredProperties]);
+
+  // Auto-scroll carousel with seamless loop
+  useEffect(() => {
+    if (featuredProperties.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentPropertyIndex(prev => prev + 1);
+    }, 5000); // Change every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [featuredProperties.length]);
+
+  // Reset position when reaching the duplicate slide (instant jump, no transition)
+  useEffect(() => {
+    if (currentPropertyIndex === featuredProperties.length) {
+      // Wait for transition to complete
+      const timer = setTimeout(() => {
+        setIsTransitioning(false); // Disable transition
+        setCurrentPropertyIndex(0); // Jump to first slide instantly
+        // Re-enable transition after jump
+        setTimeout(() => setIsTransitioning(true), 50);
+      }, 700); // Match transition duration
+      return () => clearTimeout(timer);
+    }
+  }, [currentPropertyIndex, featuredProperties.length]);
 
   // Load featured properties
   useEffect(() => {
     async function loadFeatured() {
       setLoadingProperties(true);
       const properties = await getProperties({ available: true });
-      // Get first 3 available properties
-      setFeaturedProperties(properties.slice(0, 3));
+      // Show only verified properties (rentalke_visited = true)
+      const verifiedProperties = properties.filter(p => p.rentalke_visited === true);
+      setFeaturedProperties(verifiedProperties.slice(0, 10)); // Limit to 10 properties max
       setLoadingProperties(false);
     }
     loadFeatured();
@@ -256,7 +307,7 @@ export default function HomePage() {
                 Real homes, real prices, real availability. Updated daily.
               </p>
               <p className="text-base text-blue-600 font-semibold">
-                Sample listings shown • Actively partnering with landlords
+                Growing our listings • More verified properties coming soon
               </p>
             </div>
           </ScrollReveal>
@@ -268,47 +319,142 @@ export default function HomePage() {
             </div>
           ) : featuredProperties.length > 0 ? (
             <>
-              <ScrollReveal delay={100}>
-                <div className={`grid gap-6 mb-8 ${
-                  featuredProperties.length === 1
-                    ? "grid-cols-1 max-w-md mx-auto"
-                    : featuredProperties.length === 2
-                    ? "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto"
-                    : "grid-cols-1 md:grid-cols-3 max-w-6xl mx-auto"
-                }`}>
-                  {featuredProperties.map((property) => (
-                    <PropertyCardGrid
-                      key={property.id}
-                      id={property.id}
-                      title={property.title}
-                      price={property.price}
-                      location={property.city}
-                      neighborhood={property.neighborhood}
-                      type={property.type}
-                      bedrooms={property.bedrooms}
-                      bathroom={property.bathroom}
-                      images={property.images || []}
-                      available={property.available}
-                      whatsappNumber={property.whatsapp_number}
+              {/* Carousel Container */}
+              <div className="relative overflow-hidden">
+                  <div
+                    className={`flex ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
+                    style={{ transform: `translateX(-${currentPropertyIndex * 100}%)` }}
+                  >
+                    {[...featuredProperties, featuredProperties[0]].map((property, index) => (
+                      <div
+                        key={`${property.id}-${index}`}
+                        className="w-full flex-shrink-0 px-4 flex justify-center"
+                      >
+                        <div className="flex flex-col md:flex-row gap-4 max-w-4xl items-center md:items-start">
+                    {/* Image Carousel - Left Side */}
+                    <div className="relative flex-shrink-0 w-full md:w-auto max-w-[180px] mx-auto md:mx-0">
+                      <img
+                        src={property.images[currentImageIndex]}
+                        alt={property.title}
+                        className="w-full h-auto rounded-[20px]"
+                      />
+
+                      {/* Navigation Arrows */}
+                      {property.images.length > 1 && (
+                        <>
+                          <button
+                            onClick={() => setCurrentImageIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1)}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 text-white text-2xl hover:scale-110 transition-transform"
+                          >
+                            ←
+                          </button>
+                          <button
+                            onClick={() => setCurrentImageIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-white text-2xl hover:scale-110 transition-transform"
+                          >
+                            →
+                          </button>
+
+                          {/* Dot Indicators */}
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                            {property.images.map((_, imgIndex) => (
+                              <button
+                                key={imgIndex}
+                                onClick={() => setCurrentImageIndex(imgIndex)}
+                                className={`h-2 rounded-full transition-all ${
+                                  imgIndex === currentImageIndex ? 'bg-white w-8' : 'bg-white/60 w-2 hover:bg-white/80'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Property Details - Right Side */}
+                    <div className="space-y-4 flex-1 max-w-md mx-auto md:mx-0 text-center md:text-left">
+                    <h3 className="text-2xl font-semibold text-text-primary">
+                      {property.title}
+                    </h3>
+
+                    <p className="text-3xl font-bold text-primary-blue">
+                      Ksh {property.price.toLocaleString()}
+                      <span className="text-base font-normal text-text-secondary">/month</span>
+                    </p>
+
+                    <p className="text-lg text-text-secondary">
+                      {property.neighborhood}, {property.city}
+                    </p>
+
+                    {/* Rating */}
+                    {property.average_rating && (
+                      <StarRating
+                        rating={property.average_rating}
+                        totalRatings={property.total_ratings || 0}
+                        size="md"
+                        showCount={true}
+                      />
+                    )}
+
+                    {/* Verification Badges */}
+                    <VerificationBadges
                       phoneVerified={property.phone_verified}
                       idVerified={property.id_verified}
                       addressVerified={property.address_verified}
                       rentalkeVisited={property.rentalke_visited}
-                      isDemo={true}
-                      averageRating={property.average_rating}
-                      totalRatings={property.total_ratings}
+                      size="md"
                     />
-                  ))}
-                </div>
-              </ScrollReveal>
 
-              <ScrollReveal delay={200}>
-                <div className="flex justify-center">
-                  <Link href="/search" className="btn-primary">
-                    View All Properties
-                  </Link>
+                    {/* Property Features */}
+                    <div className="flex gap-4 text-sm text-text-secondary justify-center md:justify-start">
+                      <span>🛏️ {property.bedrooms}</span>
+                      <span>🚿 {property.bathroom}</span>
+                      <span>🏠 {property.type}</span>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2 justify-center md:justify-start">
+                      <Link
+                        href={`/homes/${property.id}`}
+                        className="flex-1 text-center px-3 py-2.5 border-2 border-primary-blue text-primary-blue rounded-card text-sm font-medium hover:bg-primary-blue hover:text-white transition-colors"
+                      >
+                        View Details
+                      </Link>
+                      {property.whatsapp_number && (
+                        <a
+                          href={`https://wa.me/${property.whatsapp_number.replace(/\D/g, '')}?text=Hi, I'm interested in: ${property.title}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 px-3 py-2.5 bg-[#25D366] text-white rounded-card text-sm font-medium hover:bg-[#20BA5A] transition-colors flex items-center justify-center gap-1"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                          </svg>
+                          WhatsApp
+                        </a>
+                      )}
+                    </div>
+                    </div>
+
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Property Counter */}
+                  {featuredProperties.length > 1 && (
+                    <div className="text-center mt-6 text-text-secondary text-sm">
+                      Property {currentPropertyIndex + 1} of {featuredProperties.length}
+                    </div>
+                  )}
                 </div>
-              </ScrollReveal>
+
+              {/* View All Button - Outside Carousel */}
+              <div className="flex justify-center mt-8">
+                <Link href="/search" className="px-6 py-2.5 bg-primary-blue text-white rounded-card text-sm font-medium hover:bg-primary-blue/90 transition-colors">
+                  View All Properties
+                </Link>
+              </div>
             </>
           ) : null}
         </div>

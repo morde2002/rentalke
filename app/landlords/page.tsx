@@ -2,6 +2,26 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "List Your Property FREE - Landlords",
+  description: "List your rental property for FREE on RentalKE. Connect directly with verified tenants in Mombasa, Nairobi, Kenya. No commissions, no agent fees, no middlemen. Get instant exposure to thousands of house hunters.",
+  keywords: [
+    "list property Kenya",
+    "landlord listings Kenya",
+    "free property listing Kenya",
+    "rent out property Mombasa",
+    "landlord Nairobi",
+    "no commission property listing",
+    "advertise rental property Kenya",
+  ],
+  openGraph: {
+    title: "List Your Property FREE - Connect with Tenants | RentalKE",
+    description: "List your rental property for FREE. Connect directly with verified tenants in Kenya. No commissions, no agent fees.",
+    type: "website",
+  },
+};
 
 export default function LandlordsPage() {
   return (
