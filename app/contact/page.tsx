@@ -14,13 +14,13 @@ export default function ContactPage() {
       <Header />
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="bg-gradient-primary text-white py-16 md:py-20">
+        <section className="bg-white py-16 md:py-20 border-b border-border-gray">
           <div className="container-custom text-center">
             <ScrollReveal>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-4">
                 Get In Touch
               </h1>
-              <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              <p className="text-xl text-text-secondary max-w-2xl mx-auto">
                 Have questions? We're here to help! Reach out to us through any of the channels below.
               </p>
             </ScrollReveal>
@@ -98,32 +98,6 @@ export default function ContactPage() {
                 </ScrollReveal>
               </div>
 
-              {/* Office Location */}
-              <ScrollReveal delay={300}>
-                <div className="bg-bg-light rounded-card p-8 text-center md:text-left">
-                  <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                    <div className="w-16 h-16 bg-primary-blue/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-8 h-8 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-semibold text-text-primary mb-2">Our Office</h3>
-                      <p className="text-text-secondary mb-4">
-                        Visit us at our office in Mombasa. We're happy to meet in person to discuss your housing needs.
-                      </p>
-                      <p className="text-text-primary font-medium">
-                        Mombasa, Kenya
-                      </p>
-                      <p className="text-text-secondary text-sm mt-2">
-                        Monday - Saturday: 8:00 AM - 6:00 PM
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-
               {/* FAQ Section */}
               <ScrollReveal delay={400}>
                 <div className="mt-12 text-center">
@@ -179,16 +153,16 @@ export default function ContactPage() {
 
               {/* CTA Section */}
               <ScrollReveal delay={500}>
-                <div className="mt-16 bg-gradient-primary text-white rounded-card p-8 md:p-12 text-center">
+                <div className="mt-16 bg-primary-blue text-white rounded-card p-8 md:p-12 text-center">
                   <h2 className="text-3xl font-bold mb-4">
                     Ready to Find Your Next Home?
                   </h2>
-                  <p className="text-white/90 mb-6 max-w-2xl mx-auto">
+                  <p className="mb-6 max-w-2xl mx-auto">
                     Browse hundreds of verified rental properties across Kenya. No agents, no hassle.
                   </p>
                   <Link
                     href="/search"
-                    className="btn-primary bg-white text-primary-blue hover:bg-gray-100 inline-block"
+                    className="inline-block px-8 py-4 bg-white text-primary-blue rounded-button font-medium hover:bg-gray-100 transition-colors"
                   >
                     Browse Available Homes
                   </Link>
