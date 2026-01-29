@@ -300,7 +300,7 @@ export default function SearchPage() {
                           idVerified={property.id_verified}
                           addressVerified={property.address_verified}
                           rentalkeVisited={property.rentalke_visited}
-                          isDemo={true}
+                          isDemo={false}
                           averageRating={property.average_rating}
                           totalRatings={property.total_ratings}
                         />
