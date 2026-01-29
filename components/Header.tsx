@@ -46,6 +46,16 @@ export default function Header() {
               Find a Home
             </Link>
             <Link
+              href="/contact"
+              className={`transition-colors ${
+                pathname === "/contact"
+                  ? "text-primary-blue font-black"
+                  : "text-primary-blue hover:text-primary-blue-hover"
+              }`}
+            >
+              Contact
+            </Link>
+            <Link
               href="/landlords"
               className={`transition-colors ${
                 pathname === "/landlords"
@@ -119,6 +129,17 @@ export default function Header() {
             }`}
           >
             Find a Home
+          </Link>
+          <Link
+            href="/contact"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`block text-center py-3 rounded-card transition-colors ${
+              pathname === "/contact"
+                ? "text-primary-blue font-black bg-bg-light"
+                : "text-primary-blue hover:text-primary-blue-hover hover:bg-bg-light"
+            }`}
+          >
+            Contact
           </Link>
           <Link
             href="/landlords"
