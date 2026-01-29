@@ -123,17 +123,6 @@ export default function Header() {
           <Link
             href="/landlords"
             onClick={() => setMobileMenuOpen(false)}
-            className={`block text-center py-3 rounded-card transition-colors ${
-              pathname === "/landlords"
-                ? "text-primary-blue font-black bg-bg-light"
-                : "text-primary-blue hover:text-primary-blue-hover hover:bg-bg-light"
-            }`}
-          >
-            List Your House
-          </Link>
-          <Link
-            href="/landlords"
-            onClick={() => setMobileMenuOpen(false)}
             className="block text-center btn-primary w-full"
           >
             List Your House

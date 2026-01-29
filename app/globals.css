@@ -99,7 +99,7 @@
 
   /* Container */
   .container-custom {
-    @apply max-w-container mx-auto px-6;
+    @apply max-w-container mx-auto px-4 md:px-6;
   }
 
   /* Section Spacing */

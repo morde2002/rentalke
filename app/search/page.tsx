@@ -19,6 +19,29 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const propertiesPerPage = 20;
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [isFilterAnimating, setIsFilterAnimating] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Track scroll position for sticky filter bar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Count active filters
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (priceRange[0] > 0 || priceRange[1] < 20000) count++;
+    if (selectedType !== "all") count++;
+    if (selectedCity !== "all") count++;
+    if (selectedNeighborhood !== "all") count++;
+    if (!showOnlyAvailable) count++;
+    return count;
+  };
 
   // Available cities and neighborhoods
   const cities = ["Mombasa", "Nairobi", "Kisumu"];
@@ -78,10 +101,56 @@ export default function SearchPage() {
     setCurrentPage(page);
   };
 
+  const openFilterModal = () => {
+    setShowFilterModal(true);
+    setTimeout(() => setIsFilterAnimating(true), 10);
+  };
+
+  const closeFilterModal = () => {
+    setIsFilterAnimating(false);
+    setTimeout(() => setShowFilterModal(false), 300);
+  };
+
   return (
     <>
       <Header />
       <main className="min-h-screen bg-white">
+        {/* Scroll to Top Button */}
+        {isScrolled && (
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-8 right-8 z-50 p-3 bg-primary-blue text-white rounded-full shadow-lg hover:bg-primary-blue-hover transition-all duration-300"
+            aria-label="Scroll to top"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </button>
+        )}
+
+        {/* Mobile Sticky Filter Bar - Shows on scroll */}
+        <div className={`lg:hidden fixed top-16 left-0 right-0 bg-white border-b border-border-gray z-40 transition-transform duration-300 ${isScrolled ? 'translate-y-0' : '-translate-y-full'}`}>
+          <div className="container-custom py-3 flex items-center justify-between">
+            <button
+              onClick={openFilterModal}
+              className="flex items-center gap-2 px-4 py-2 border border-border-gray rounded-card hover:bg-bg-light transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span className="font-medium">Filter</span>
+              {getActiveFilterCount() > 0 && (
+                <span className="bg-primary-blue text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {getActiveFilterCount()}
+                </span>
+              )}
+            </button>
+            <span className="text-sm text-text-secondary">
+              • {filteredProperties.length} homes found
+            </span>
+          </div>
+        </div>
+
         {/* Search Header */}
         <section className="bg-white pt-8 pb-4">
           <div className="container-custom">
@@ -97,9 +166,27 @@ export default function SearchPage() {
         {/* Filters and Results */}
         <section className="pt-4 pb-8">
           <div className="container-custom">
+            {/* Mobile Filter Button - Before scrolling */}
+            <div className="lg:hidden mb-4">
+              <button
+                onClick={openFilterModal}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-border-gray rounded-card hover:bg-bg-light transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                <span className="font-medium">Filter & Sort</span>
+                {getActiveFilterCount() > 0 && (
+                  <span className="bg-primary-blue text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {getActiveFilterCount()}
+                  </span>
+                )}
+              </button>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-              {/* Filters Sidebar */}
-              <aside className="lg:col-span-3">
+              {/* Filters Sidebar - Desktop Only */}
+              <aside className="hidden lg:block lg:col-span-3">
                 <div className="lg:sticky lg:top-20 space-y-3">
                 <div className="bg-white border border-border-gray rounded-card p-3 space-y-3">
                   {/* Location Filter */}
@@ -281,7 +368,7 @@ export default function SearchPage() {
                 ) : filteredProperties.length > 0 ? (
                   <>
                     <ScrollReveal>
-                      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                      <div className="grid gap-2 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
                         {currentProperties.map((property) => (
                         <PropertyCardGrid
                           key={property.id}
@@ -387,7 +474,9 @@ export default function SearchPage() {
                       onClick={() => {
                         setPriceRange([0, 20000]);
                         setSelectedType("all");
-                        setShowOnlyAvailable(false);
+                        setSelectedCity("all");
+                        setSelectedNeighborhood("all");
+                        setShowOnlyAvailable(true);
                       }}
                       className="btn-primary"
                     >
@@ -399,6 +488,210 @@ export default function SearchPage() {
             </div>
           </div>
         </section>
+
+        {/* Mobile Filter Modal - Bottom Sheet */}
+        {showFilterModal && (
+          <>
+            {/* Backdrop */}
+            <div
+              className={`lg:hidden fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 ${isFilterAnimating ? 'opacity-100' : 'opacity-0'}`}
+              onClick={closeFilterModal}
+            ></div>
+
+            {/* Bottom Sheet */}
+            <div className={`lg:hidden fixed bottom-0 left-0 right-0 h-[75vh] z-50 bg-white rounded-t-3xl shadow-2xl transition-transform duration-300 ease-out ${isFilterAnimating ? 'translate-y-0' : 'translate-y-full'}`}>
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white rounded-t-3xl border-b border-border-gray px-4 py-3 flex items-center justify-between">
+                <h2 className="text-base font-semibold">Filters</h2>
+                <button
+                  onClick={closeFilterModal}
+                  className="p-1.5 hover:bg-bg-light rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Modal Content - Scrollable */}
+              <div className="overflow-y-auto h-[calc(75vh-110px)] px-4 py-3">
+                <div className="space-y-4">
+                  {/* Location Filter */}
+                  <div>
+                    <h3 className="font-medium text-text-primary mb-2 text-sm">
+                      Location
+                    </h3>
+                    <div className="space-y-2">
+                      <select
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-border-gray rounded-card focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                      >
+                        <option value="all">All Cities</option>
+                        {cities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+
+                      {selectedCity !== "all" && (
+                        <select
+                          value={selectedNeighborhood}
+                          onChange={(e) => setSelectedNeighborhood(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-border-gray rounded-card focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                        >
+                          <option value="all">All Neighborhoods</option>
+                          {neighborhoods[selectedCity]?.map((neighborhood) => (
+                            <option key={neighborhood} value={neighborhood}>
+                              {neighborhood}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Availability Filter */}
+                  <div>
+                    <h3 className="font-medium text-text-primary mb-2 text-sm">
+                      Availability
+                    </h3>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={showOnlyAvailable}
+                        onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                        className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                      />
+                      <span className="text-text-secondary text-sm">
+                        Show only available
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Price Range */}
+                  <div>
+                    <h3 className="font-medium text-text-primary mb-2 text-sm">
+                      Price Range
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-text-secondary">Min</span>
+                        <span className="font-medium">
+                          Ksh {priceRange[0].toLocaleString()}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="20000"
+                        step="500"
+                        value={priceRange[0]}
+                        onChange={(e) =>
+                          setPriceRange([parseInt(e.target.value), priceRange[1]])
+                        }
+                        className="w-full"
+                      />
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-text-secondary">Max</span>
+                        <span className="font-medium">
+                          Ksh {priceRange[1].toLocaleString()}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="20000"
+                        step="500"
+                        value={priceRange[1]}
+                        onChange={(e) =>
+                          setPriceRange([priceRange[0], parseInt(e.target.value)])
+                        }
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  {/* House Type */}
+                  <div>
+                    <h3 className="font-medium text-text-primary mb-2 text-sm">
+                      House Type
+                    </h3>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="type"
+                          value="all"
+                          checked={selectedType === "all"}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">All Types</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="type"
+                          value="Bedsitter"
+                          checked={selectedType === "Bedsitter"}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">Bedsitter</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="type"
+                          value="1 Bedroom"
+                          checked={selectedType === "1 Bedroom"}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">1 Bedroom</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="type"
+                          value="2 Bedroom"
+                          checked={selectedType === "2 Bedroom"}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          className="w-4 h-4 text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">2 Bedroom</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer - Sticky at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-border-gray px-4 py-3 flex gap-2">
+                <button
+                  onClick={() => {
+                    setPriceRange([0, 20000]);
+                    setSelectedType("all");
+                    setSelectedCity("all");
+                    setSelectedNeighborhood("all");
+                    setShowOnlyAvailable(true);
+                  }}
+                  className="flex-1 px-3 py-2.5 text-sm border border-border-gray text-text-primary rounded-card font-medium hover:bg-bg-light transition-colors"
+                >
+                  Clear All
+                </button>
+                <button
+                  onClick={closeFilterModal}
+                  className="flex-1 px-3 py-2.5 text-sm bg-primary-blue text-white rounded-card font-medium hover:bg-primary-blue-hover transition-colors"
+                >
+                  Show {filteredProperties.length} homes
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </main>
       <Footer />
     </>

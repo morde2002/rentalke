@@ -100,7 +100,7 @@ export default function PropertyCardGrid({
   return (
     <div className="bg-white border border-border-gray rounded-[20px] overflow-hidden property-card h-full flex flex-col">
         {/* Image Carousel Preview */}
-        <div className="relative aspect-[2/1] bg-bg-light group">
+        <div className="relative aspect-[4/3] md:aspect-[2/1] bg-bg-light group">
           {images && images.length > 0 ? (
             <>
               {/* Render all images with crossfade transitions */}
