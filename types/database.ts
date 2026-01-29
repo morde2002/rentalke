@@ -23,6 +23,8 @@ export interface Property {
   video_url?: string | null;
   features: string[];
   nearby_places: string[];
+  additional_info?: string | null;
+  google_maps_url?: string | null;
   // Verification fields
   phone_verified?: boolean;
   id_verified?: boolean;
