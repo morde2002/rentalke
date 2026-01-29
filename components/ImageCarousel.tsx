@@ -6,22 +6,15 @@ import Image from "next/image";
 interface ImageCarouselProps {
   images: string[];
   title: string;
-  video?: string;
   autoSlideInterval?: number; // in milliseconds, default 5000 (5 seconds)
 }
 
-export default function ImageCarousel({ images, title, video, autoSlideInterval = 5000 }: ImageCarouselProps) {
+export default function ImageCarousel({ images, title, autoSlideInterval = 5000 }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Combine images and video into media array
-  const mediaItems = [...images];
-  if (video) {
-    mediaItems.push(video);
-  }
-
-  const totalItems = mediaItems.length;
+  const totalItems = images.length;
 
   // Auto-slide effect
   useEffect(() => {
@@ -66,45 +59,12 @@ export default function ImageCarousel({ images, title, video, autoSlideInterval 
     }, 800);
   };
 
-  const isVideo = (item: string) => {
-    return item.includes('youtube.com') || item.includes('youtu.be') || item.endsWith('.mp4');
-  };
-
-  const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.includes('youtu.be')
-      ? url.split('youtu.be/')[1]?.split('?')[0]
-      : url.split('v=')[1]?.split('&')[0];
-    return `https://www.youtube.com/embed/${videoId}`;
-  };
-
   return (
     <div className="relative aspect-[21/9] bg-bg-light rounded-[20px] overflow-hidden group">
-      {/* Main Image/Video Display */}
+      {/* Main Image Display */}
       <div className="relative w-full h-full">
         {/* All images rendered but only visible one shows */}
-        {mediaItems.map((item, index) => {
-          if (isVideo(item)) {
-            // Only show video when it's the current index
-            return index === currentIndex ? (
-              <div key={`video-${index}`} className="w-full h-full absolute inset-0">
-                {item.includes('youtube') || item.includes('youtu.be') ? (
-                  <iframe
-                    src={getYouTubeEmbedUrl(item)}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <video
-                    src={item}
-                    controls
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            ) : null;
-          }
-
+        {images.map((image, index) => {
           // For images, show both current and next during transition
           const isCurrent = index === currentIndex;
           const isNext = index === nextIndex && isTransitioning;
@@ -114,10 +74,10 @@ export default function ImageCarousel({ images, title, video, autoSlideInterval 
           return (
             <Image
               key={`image-${index}`}
-              src={item}
+              src={image}
               alt={`${title} - Image ${index + 1}`}
               fill
-              className={`object-cover absolute inset-0 transition-opacity duration-[800ms] ease-in-out ${
+              className={`object-contain absolute inset-0 transition-opacity duration-[800ms] ease-in-out ${
                 isCurrent && isTransitioning
                   ? 'opacity-0'
                   : isCurrent
@@ -159,7 +119,7 @@ export default function ImageCarousel({ images, title, video, autoSlideInterval 
       {/* Dots Indicator */}
       {totalItems > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {mediaItems.map((_, index) => (
+          {images.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}

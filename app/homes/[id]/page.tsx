@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import Spinner from "@/components/Spinner";
-import ImageCarousel from "@/components/ImageCarousel";
 import SafetyTips from "@/components/SafetyTips";
 import VerificationBadges from "@/components/VerificationBadges";
 import PropertyHighlights from "@/components/PropertyHighlights";
@@ -23,6 +22,43 @@ export default function PropertyDetailPage({
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [isWhatsAppLoading, setIsWhatsAppLoading] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+  };
+
+  const goToPrevious = () => {
+    if (property?.images) {
+      setLightboxIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (property?.images) {
+      setLightboxIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1);
+    }
+  };
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') goToPrevious();
+      if (e.key === 'ArrowRight') goToNext();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, property?.images]);
 
   useEffect(() => {
     async function loadProperty() {
@@ -156,19 +192,204 @@ export default function PropertyDetailPage({
         <section className="pb-16">
           <div className="container-custom">
             <div className="max-w-5xl mx-auto">
-              {/* Images */}
+              {/* Images Grid and Video */}
               <div className="mb-8">
-                {property.images && property.images.length > 0 ? (
-                  <ImageCarousel
-                    images={property.images}
-                    title={property.title}
-                  />
+                {property.video_url ? (
+                  /* Layout with video: Video left, Images right */
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    {/* Video Section - Narrower column */}
+                    <div className="lg:col-span-5">
+                      <h2 className="text-lg font-semibold mb-3">Video Tour</h2>
+                      <div className="relative aspect-[9/16] max-h-[500px] bg-bg-light rounded-[20px] overflow-hidden mx-auto">
+                        {property.video_url.includes('youtube.com') || property.video_url.includes('youtu.be') ? (
+                          <iframe
+                            src={(() => {
+                              const videoId = property.video_url.includes('youtu.be')
+                                ? property.video_url.split('youtu.be/')[1]?.split('?')[0]
+                                : property.video_url.split('v=')[1]?.split('&')[0];
+                              return `https://www.youtube.com/embed/${videoId}`;
+                            })()}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <video
+                            src={property.video_url}
+                            controls
+                            className="w-full h-full object-contain"
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Images Grid - Wider column with 2x2 grid */}
+                    <div className="lg:col-span-7">
+                      <h2 className="text-lg font-semibold mb-3">
+                        Photos ({property.images?.length || 0})
+                      </h2>
+                      {property.images && property.images.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-3 max-h-[500px] h-[500px]">
+                          {property.images.slice(0, 4).map((image, index) => (
+                            <button
+                              key={index}
+                              onClick={() => openLightbox(index)}
+                              className="relative bg-bg-light rounded-[12px] overflow-hidden cursor-pointer group hover:opacity-90 transition-opacity h-full"
+                            >
+                              <img
+                                src={image}
+                                alt={`${property.title} - Photo ${index + 1}`}
+                                className="w-full h-full object-contain"
+                              />
+                              {/* Hover overlay */}
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                <svg
+                                  className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                </svg>
+                              </div>
+                              {/* Show "+X more" on 4th image if there are more */}
+                              {index === 3 && property.images.length > 4 && (
+                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                  <span className="text-white text-2xl font-semibold">
+                                    +{property.images.length - 4} more
+                                  </span>
+                                </div>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="relative aspect-square bg-bg-light rounded-[20px] flex items-center justify-center">
+                          <span className="text-6xl">🏠</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ) : (
-                  <div className="relative aspect-[16/9] bg-bg-light rounded-button flex items-center justify-center">
-                    <span className="text-8xl">🏠</span>
+                  /* Layout without video: Full-width images grid */
+                  <div>
+                    <h2 className="text-xl font-semibold mb-3">
+                      Property Photos ({property.images?.length || 0})
+                    </h2>
+                    {property.images && property.images.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {property.images.map((image, index) => (
+                          <button
+                            key={index}
+                            onClick={() => openLightbox(index)}
+                            className="relative aspect-square bg-bg-light rounded-[12px] overflow-hidden cursor-pointer group hover:opacity-90 transition-opacity"
+                          >
+                            <img
+                              src={image}
+                              alt={`${property.title} - Photo ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {/* Hover overlay */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                              <svg
+                                className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                              </svg>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="relative aspect-video bg-bg-light rounded-[20px] flex items-center justify-center">
+                        <span className="text-8xl">🏠</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
+
+              {/* Lightbox Overlay */}
+              {lightboxOpen && property.images && (
+                <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+                  {/* Close button */}
+                  <button
+                    onClick={closeLightbox}
+                    className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+                    aria-label="Close"
+                  >
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  {/* Image counter */}
+                  <div className="absolute top-4 left-4 text-white text-lg font-medium z-10">
+                    {lightboxIndex + 1} / {property.images.length}
+                  </div>
+
+                  {/* Previous button */}
+                  {property.images.length > 1 && (
+                    <button
+                      onClick={goToPrevious}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors p-2 z-10"
+                      aria-label="Previous image"
+                    >
+                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Main image */}
+                  <div className="max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
+                    <img
+                      src={property.images[lightboxIndex]}
+                      alt={`${property.title} - Photo ${lightboxIndex + 1}`}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+
+                  {/* Next button */}
+                  {property.images.length > 1 && (
+                    <button
+                      onClick={goToNext}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors p-2 z-10"
+                      aria-label="Next image"
+                    >
+                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Thumbnail strip at bottom */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-5xl w-full px-4">
+                    <div className="flex gap-2 overflow-x-auto pb-2 justify-center">
+                      {property.images.map((image, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setLightboxIndex(index)}
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                            index === lightboxIndex
+                              ? 'border-white scale-110'
+                              : 'border-transparent opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          <img
+                            src={image}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Main Content */}
