@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import LoadingProvider from "@/components/LoadingProvider";
+import MetaPixel from "@/components/analytics/MetaPixel";
 import "./globals.css";
 
 const inter = Inter({
@@ -125,6 +126,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="antialiased">
+        <MetaPixel />
         <LoadingProvider>
           {children}
         </LoadingProvider>
