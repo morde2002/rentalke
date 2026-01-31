@@ -191,7 +191,7 @@ export default function PropertyCardGrid({
             return (
               <div className="mb-0.5">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
-                  {categoryInfo.label}
+                  Price: {categoryInfo.label}
                 </span>
               </div>
             );

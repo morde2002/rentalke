@@ -12,7 +12,7 @@ import StarRating from "@/components/StarRating";
 import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
 import type { Property } from "@/types/database";
-import { getPriceCategoryInfo } from "@/lib/priceCategory";
+import { getPriceCategoryInfo, getPriceCategory } from "@/lib/priceCategory";
 
 export default function PropertyDetailPage({
   params,
@@ -441,16 +441,26 @@ export default function PropertyDetailPage({
                     </div>
                     {(() => {
                       const categoryInfo = getPriceCategoryInfo(property.price);
+                      const category = getPriceCategory(property.price);
+                      const rangeText = category === 'budget'
+                        ? 'Under Ksh 7,000/month'
+                        : category === 'mid-range'
+                        ? 'Ksh 7,000 - 12,000/month'
+                        : 'Over Ksh 12,000/month';
+
                       return (
-                        <div className="flex justify-center md:justify-start">
+                        <div className="flex flex-col items-center md:items-start gap-2">
                           <span className={`inline-flex items-center px-4 py-2 rounded-full text-lg font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
-                            {categoryInfo.label}
+                            Price: {categoryInfo.label}
                           </span>
+                          <p className="text-sm text-text-secondary">
+                            {rangeText}
+                          </p>
                         </div>
                       );
                     })()}
                     <p className="text-base text-text-secondary mt-2">
-                      Contact landlord for exact pricing
+                      💬 Contact the landlord via WhatsApp below for exact monthly rent, deposit amount, and payment details.
                     </p>
                   </div>
 

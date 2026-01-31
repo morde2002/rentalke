@@ -14,6 +14,7 @@ import { getProperties } from "@/lib/properties";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
 import type { Property } from "@/types/database";
 import Link from "next/link";
+import { getPriceCategoryInfo } from "@/lib/priceCategory";
 
 // Available locations - will be expanded later with database
 const availableLocations = [
@@ -377,10 +378,16 @@ export default function HomePage() {
                       {property.title}
                     </h3>
 
-                    <p className="text-3xl font-bold text-primary-blue">
-                      Ksh {property.price.toLocaleString()}
-                      <span className="text-base font-normal text-text-secondary">/month</span>
-                    </p>
+                    <div>
+                      {(() => {
+                        const categoryInfo = getPriceCategoryInfo(property.price);
+                        return (
+                          <span className={`inline-flex items-center px-4 py-2 rounded-full text-base font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                            Price: {categoryInfo.label}
+                          </span>
+                        );
+                      })()}
+                    </div>
 
                     <p className="text-lg text-text-secondary">
                       {property.neighborhood}, {property.city}

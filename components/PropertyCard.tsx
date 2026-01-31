@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { getPriceCategoryInfo } from "@/lib/priceCategory";
 
 interface PropertyCardProps {
   id: string;
@@ -54,12 +55,17 @@ export default function PropertyCard({
         {/* Details */}
         <div className="md:col-span-8 flex flex-col justify-between">
           <div>
-            {/* Price and Status */}
+            {/* Price Category and Status */}
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-2xl font-semibold text-text-primary">
-                  Ksh {price.toLocaleString()}/month
-                </p>
+                {(() => {
+                  const categoryInfo = getPriceCategoryInfo(price);
+                  return (
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                      Price: {categoryInfo.label}
+                    </span>
+                  );
+                })()}
               </div>
               {available ? (
                 <span className="badge-available">
@@ -110,7 +116,7 @@ export default function PropertyCard({
             </Link>
             {available && whatsappNumber && (
               <a
-                href={`https://wa.me/${whatsappNumber}?text=Hi, I'm interested in the ${type} in ${neighborhood} for Ksh ${price.toLocaleString()}/month`}
+                href={`https://wa.me/${whatsappNumber}?text=Hi, I'm interested in the ${type} in ${neighborhood}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-whatsapp"
