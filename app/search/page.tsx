@@ -8,9 +8,10 @@ import ScrollReveal from "@/components/ScrollReveal";
 import PropertyCardGrid from "@/components/PropertyCardGrid";
 import { getProperties } from "@/lib/properties";
 import type { Property } from "@/types/database";
+import { getPriceCategory, type PriceCategory } from "@/lib/priceCategory";
 
 export default function SearchPage() {
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000]);
+  const [selectedCategories, setSelectedCategories] = useState<PriceCategory[]>(['budget', 'mid-range', 'premium']);
   const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("all");
@@ -35,7 +36,7 @@ export default function SearchPage() {
   // Count active filters
   const getActiveFilterCount = () => {
     let count = 0;
-    if (priceRange[0] > 0 || priceRange[1] < 20000) count++;
+    if (selectedCategories.length < 3) count++; // If not all categories selected
     if (selectedType !== "all") count++;
     if (selectedCity !== "all") count++;
     if (selectedNeighborhood !== "all") count++;
@@ -56,8 +57,6 @@ export default function SearchPage() {
     async function loadProperties() {
       setLoading(true);
       const data = await getProperties({
-        minPrice: priceRange[0],
-        maxPrice: priceRange[1],
         type: selectedType,
         available: showOnlyAvailable ? true : undefined,
       });
@@ -67,12 +66,12 @@ export default function SearchPage() {
     }
 
     loadProperties();
-  }, [priceRange, selectedType, showOnlyAvailable, selectedCity, selectedNeighborhood]);
+  }, [selectedType, showOnlyAvailable, selectedCity, selectedNeighborhood]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [priceRange, selectedType, showOnlyAvailable, selectedCity, selectedNeighborhood]);
+  }, [selectedCategories, selectedType, showOnlyAvailable, selectedCity, selectedNeighborhood]);
 
   // Reset neighborhood when city changes
   useEffect(() => {
@@ -84,10 +83,15 @@ export default function SearchPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
 
-  // Filter properties by location
+  // Filter properties by location and price category
   const filteredProperties = properties.filter((property) => {
     if (selectedCity !== "all" && property.city !== selectedCity) return false;
     if (selectedNeighborhood !== "all" && property.neighborhood !== selectedNeighborhood) return false;
+
+    // Filter by price category
+    const propertyCategory = getPriceCategory(property.price);
+    if (!selectedCategories.includes(propertyCategory)) return false;
+
     return true;
   });
 
@@ -245,46 +249,57 @@ export default function SearchPage() {
                     </label>
                   </div>
 
-                  {/* Price Range */}
+                  {/* Price Category */}
                   <div>
                     <h3 className="font-semibold text-text-primary mb-2 text-sm">
                       Price Range
                     </h3>
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-text-secondary">Min</span>
-                        <span className="font-medium">
-                          Ksh {priceRange[0].toLocaleString()}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="20000"
-                        step="500"
-                        value={priceRange[0]}
-                        onChange={(e) =>
-                          setPriceRange([parseInt(e.target.value), priceRange[1]])
-                        }
-                        className="w-full"
-                      />
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-text-secondary">Max</span>
-                        <span className="font-medium">
-                          Ksh {priceRange[1].toLocaleString()}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="20000"
-                        step="500"
-                        value={priceRange[1]}
-                        onChange={(e) =>
-                          setPriceRange([priceRange[0], parseInt(e.target.value)])
-                        }
-                        className="w-full"
-                      />
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes('budget')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, 'budget']);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== 'budget'));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-xs">Budget-Friendly (Under Ksh 7,000)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes('mid-range')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, 'mid-range']);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== 'mid-range'));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-xs">Mid-Range (Ksh 7,000 - 12,000)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes('premium')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, 'premium']);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== 'premium'));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-xs">Premium (Over Ksh 12,000)</span>
+                      </label>
                     </div>
                   </div>
 
@@ -344,7 +359,7 @@ export default function SearchPage() {
                   {/* Clear Filters */}
                   <button
                     onClick={() => {
-                      setPriceRange([0, 20000]);
+                      setSelectedCategories(['budget', 'mid-range', 'premium']);
                       setSelectedType("all");
                       setSelectedCity("all");
                       setSelectedNeighborhood("all");
@@ -472,7 +487,7 @@ export default function SearchPage() {
                     </p>
                     <button
                       onClick={() => {
-                        setPriceRange([0, 20000]);
+                        setSelectedCategories(['budget', 'mid-range', 'premium']);
                         setSelectedType("all");
                         setSelectedCity("all");
                         setSelectedNeighborhood("all");
@@ -570,46 +585,57 @@ export default function SearchPage() {
                     </label>
                   </div>
 
-                  {/* Price Range */}
+                  {/* Price Category */}
                   <div>
                     <h3 className="font-medium text-text-primary mb-2 text-sm">
                       Price Range
                     </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-text-secondary">Min</span>
-                        <span className="font-medium">
-                          Ksh {priceRange[0].toLocaleString()}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="20000"
-                        step="500"
-                        value={priceRange[0]}
-                        onChange={(e) =>
-                          setPriceRange([parseInt(e.target.value), priceRange[1]])
-                        }
-                        className="w-full"
-                      />
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-text-secondary">Max</span>
-                        <span className="font-medium">
-                          Ksh {priceRange[1].toLocaleString()}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="20000"
-                        step="500"
-                        value={priceRange[1]}
-                        onChange={(e) =>
-                          setPriceRange([priceRange[0], parseInt(e.target.value)])
-                        }
-                        className="w-full"
-                      />
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes('budget')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, 'budget']);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== 'budget'));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">Budget-Friendly (Under Ksh 7,000)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes('mid-range')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, 'mid-range']);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== 'mid-range'));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">Mid-Range (Ksh 7,000 - 12,000)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes('premium')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, 'premium']);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== 'premium'));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-border-gray text-primary-blue focus:ring-2 focus:ring-primary-blue cursor-pointer"
+                        />
+                        <span className="text-text-secondary text-sm">Premium (Over Ksh 12,000)</span>
+                      </label>
                     </div>
                   </div>
 
@@ -672,7 +698,7 @@ export default function SearchPage() {
               <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-border-gray px-4 py-3 flex gap-2">
                 <button
                   onClick={() => {
-                    setPriceRange([0, 20000]);
+                    setSelectedCategories(['budget', 'mid-range', 'premium']);
                     setSelectedType("all");
                     setSelectedCity("all");
                     setSelectedNeighborhood("all");

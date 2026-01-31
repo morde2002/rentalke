@@ -12,6 +12,7 @@ import StarRating from "@/components/StarRating";
 import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
 import type { Property } from "@/types/database";
+import { getPriceCategoryInfo } from "@/lib/priceCategory";
 
 export default function PropertyDetailPage({
   params,
@@ -438,17 +439,19 @@ export default function PropertyDetailPage({
                         </span>
                       )}
                     </div>
-                    <p className="text-4xl font-semibold text-text-primary">
-                      Ksh {property.price.toLocaleString()}
-                      <span className="text-xl text-text-secondary font-normal">
-                        /month
-                      </span>
+                    {(() => {
+                      const categoryInfo = getPriceCategoryInfo(property.price);
+                      return (
+                        <div className="flex justify-center md:justify-start">
+                          <span className={`inline-flex items-center px-4 py-2 rounded-full text-lg font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                            {categoryInfo.label}
+                          </span>
+                        </div>
+                      );
+                    })()}
+                    <p className="text-base text-text-secondary mt-2">
+                      Contact landlord for exact pricing
                     </p>
-                    {property.deposit && (
-                      <p className="text-sm text-text-secondary mt-2">
-                        Deposit: Ksh {property.deposit.toLocaleString()}
-                      </p>
-                    )}
                   </div>
 
                   {/* About This Home */}

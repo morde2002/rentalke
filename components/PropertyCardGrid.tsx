@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Spinner from "./Spinner";
 import VerificationBadges from "./VerificationBadges";
 import StarRating from "./StarRating";
+import { getPriceCategoryInfo } from "@/lib/priceCategory";
 
 interface PropertyCardGridProps {
   id: string;
@@ -184,10 +185,17 @@ export default function PropertyCardGrid({
 
         {/* Content */}
         <div className="p-2 flex-1 flex flex-col">
-          {/* Price */}
-          <p className="text-base font-semibold text-text-primary mb-0.5">
-            Ksh {price.toLocaleString()}<span className="text-[10px] font-normal text-text-secondary">/mo</span>
-          </p>
+          {/* Price Category */}
+          {(() => {
+            const categoryInfo = getPriceCategoryInfo(price);
+            return (
+              <div className="mb-0.5">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                  {categoryInfo.label}
+                </span>
+              </div>
+            );
+          })()}
 
           {/* Title */}
           <h3 className="text-xs font-semibold text-text-primary mb-0.5 line-clamp-1 hover:text-primary-blue transition-colors">
