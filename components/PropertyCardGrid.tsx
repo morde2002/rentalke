@@ -190,7 +190,7 @@ export default function PropertyCardGrid({
             const categoryInfo = getPriceCategoryInfo(price);
             return (
               <div className="mb-0.5">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                <span className={`inline-flex items-center pr-2 pl-1 py-0.5 rounded-full text-[10px] font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
                   Price: {categoryInfo.label}
                 </span>
               </div>

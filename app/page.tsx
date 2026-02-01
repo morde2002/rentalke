@@ -373,21 +373,21 @@ export default function HomePage() {
                     </div>
 
                     {/* Property Details - Right Side */}
-                    <div className="space-y-4 flex-1 max-w-md mx-auto md:mx-0 text-center md:text-left">
+                    <div className="space-y-4 flex-1 max-w-md mx-auto md:mx-0 text-left">
                     <h3 className="text-2xl font-semibold text-text-primary">
                       {property.title}
                     </h3>
 
-                    <div>
-                      {(() => {
-                        const categoryInfo = getPriceCategoryInfo(property.price);
-                        return (
-                          <span className={`inline-flex items-center px-4 py-2 rounded-full text-base font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                    {(() => {
+                      const categoryInfo = getPriceCategoryInfo(property.price);
+                      return (
+                        <div>
+                          <span className={`inline-flex items-center pr-4 pl-2 py-2 rounded-full text-base font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
                             Price: {categoryInfo.label}
                           </span>
-                        );
-                      })()}
-                    </div>
+                        </div>
+                      );
+                    })()}
 
                     <p className="text-lg text-text-secondary">
                       {property.neighborhood}, {property.city}
@@ -413,14 +413,14 @@ export default function HomePage() {
                     />
 
                     {/* Property Features */}
-                    <div className="flex gap-4 text-sm text-text-secondary justify-center md:justify-start">
+                    <div className="flex gap-4 text-sm text-text-secondary justify-start">
                       <span>🛏️ {property.bedrooms}</span>
                       <span>🚿 {property.bathroom}</span>
                       <span>🏠 {property.type}</span>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2 justify-center md:justify-start">
+                    <div className="flex gap-2 pt-2 justify-start">
                       <Link
                         href={`/homes/${property.id}`}
                         className="flex-1 text-center px-3 py-2.5 border-2 border-primary-blue text-primary-blue rounded-card text-sm font-medium hover:bg-primary-blue hover:text-white transition-colors"

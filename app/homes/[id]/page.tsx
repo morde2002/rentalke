@@ -449,8 +449,8 @@ export default function PropertyDetailPage({
                         : 'Over Ksh 12,000/month';
 
                       return (
-                        <div className="flex flex-col items-center md:items-start gap-2">
-                          <span className={`inline-flex items-center px-4 py-2 rounded-full text-lg font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                        <div className="flex flex-col items-start gap-2">
+                          <span className={`inline-flex items-center pr-4 pl-2 py-2 rounded-full text-lg font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
                             Price: {categoryInfo.label}
                           </span>
                           <p className="text-sm text-text-secondary">

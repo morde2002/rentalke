@@ -61,7 +61,7 @@ export default function PropertyCard({
                 {(() => {
                   const categoryInfo = getPriceCategoryInfo(price);
                   return (
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
+                    <span className={`inline-flex items-center pr-3 pl-1.5 py-1 rounded-full text-sm font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
                       Price: {categoryInfo.label}
                     </span>
                   );
