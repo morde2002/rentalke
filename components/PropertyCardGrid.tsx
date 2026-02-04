@@ -5,6 +5,7 @@ import Spinner from "./Spinner";
 import VerificationBadges from "./VerificationBadges";
 import StarRating from "./StarRating";
 import { getPriceCategoryInfo } from "@/lib/priceCategory";
+import { optimizeCloudinaryImage } from "@/lib/cloudinary";
 
 interface PropertyCardGridProps {
   id: string;
@@ -114,7 +115,7 @@ export default function PropertyCardGrid({
                 return (
                   <Image
                     key={`image-${index}`}
-                    src={image}
+                    src={optimizeCloudinaryImage(image, { width: 600, quality: 'auto:good' })}
                     alt={`${title} - Image ${index + 1}`}
                     fill
                     className={`object-cover absolute inset-0 transition-opacity duration-[1000ms] ease-in-out ${
@@ -126,6 +127,7 @@ export default function PropertyCardGrid({
                         ? 'opacity-100'
                         : 'opacity-0'
                     }`}
+                    priority={index === 0}
                   />
                 );
               })}
