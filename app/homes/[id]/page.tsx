@@ -112,7 +112,7 @@ export default function PropertyDetailPage({
     );
   }
 
-  // Generate structured data for SEO (Schema.org JSON-LD)
+  // Generate comprehensive structured data for SEO (Schema.org JSON-LD)
   const generateStructuredData = () => {
     if (!property) return null;
 
@@ -121,7 +121,7 @@ export default function PropertyDetailPage({
       "@type": "RealEstateListing",
       "name": property.title,
       "description": property.description || `${property.type} for rent in ${property.neighborhood}, ${property.city}`,
-      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.vercel.app'}/homes/${property.id}`,
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.com'}/homes/${property.id}`,
       "address": {
         "@type": "PostalAddress",
         "addressLocality": property.neighborhood,
@@ -142,6 +142,11 @@ export default function PropertyDetailPage({
           "price": property.price,
           "priceCurrency": "KES",
           "unitText": "MONTH"
+        },
+        "seller": {
+          "@type": "Person",
+          "name": property.landlord_name || "Landlord",
+          "telephone": property.whatsapp_number || property.landlord_phone
         }
       },
       "numberOfRooms": property.bedrooms,
@@ -149,14 +154,49 @@ export default function PropertyDetailPage({
         "@type": "QuantitativeValue",
         "value": property.type
       },
+      "amenityFeature": [
+        ...(property.water_included ? [{
+          "@type": "LocationFeatureSpecification",
+          "name": "Water",
+          "value": property.water_payment === 'included_in_rent' ? "Included in rent" : "Available"
+        }] : []),
+        ...(property.security_type ? [{
+          "@type": "LocationFeatureSpecification",
+          "name": "Security",
+          "value": property.security_type.replace('_', ' ')
+        }] : []),
+        ...(property.electricity_type ? [{
+          "@type": "LocationFeatureSpecification",
+          "name": "Electricity",
+          "value": property.electricity_type.replace('_', ' ')
+        }] : [])
+      ],
       "image": property.images && property.images.length > 0 ? property.images : undefined,
+      "video": property.video_url ? {
+        "@type": "VideoObject",
+        "contentUrl": property.video_url,
+        "name": `Video tour of ${property.title}`,
+        "description": `Virtual tour of ${property.type} in ${property.neighborhood}, ${property.city}`
+      } : undefined,
       "aggregateRating": property.average_rating ? {
         "@type": "AggregateRating",
         "ratingValue": property.average_rating,
         "reviewCount": property.total_ratings || 0,
         "bestRating": "5",
         "worstRating": "1"
-      } : undefined
+      } : undefined,
+      "additionalProperty": [
+        {
+          "@type": "PropertyValue",
+          "name": "Verified by RentalKE",
+          "value": property.rentalke_visited ? "Yes" : "No"
+        },
+        ...(property.deposit ? [{
+          "@type": "PropertyValue",
+          "name": "Deposit",
+          "value": `KES ${property.deposit.toLocaleString()}`
+        }] : [])
+      ]
     };
   };
 

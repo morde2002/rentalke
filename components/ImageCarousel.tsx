@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { optimizeCloudinaryImage } from "@/lib/cloudinary";
 
 interface ImageCarouselProps {
   images: string[];
@@ -74,7 +75,7 @@ export default function ImageCarousel({ images, title, autoSlideInterval = 5000 
           return (
             <Image
               key={`image-${index}`}
-              src={image}
+              src={optimizeCloudinaryImage(image, { width: 1200, quality: 'auto:good' })}
               alt={`${title} - Image ${index + 1}`}
               fill
               className={`object-contain absolute inset-0 transition-opacity duration-[800ms] ease-in-out ${

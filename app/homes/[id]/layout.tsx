@@ -16,20 +16,54 @@ export async function generateMetadata({
     };
   }
 
-  // Create dynamic title and description based on property details
-  const title = `${property.type} in ${property.neighborhood}, ${property.city} - KSh ${property.price.toLocaleString()}/month`;
-  const description = `${property.type} for rent in ${property.neighborhood}, ${property.city}. ${property.bedrooms}, ${property.bathroom}. KSh ${property.price.toLocaleString()}/month. ${property.available ? 'Available now' : 'Currently occupied'}. ${property.phone_verified ? 'Verified landlord' : 'Direct landlord contact'}. ${property.description?.slice(0, 100) || 'Contact for more details'}.`;
+  // Create SEO-optimized title (mirrors competitor strategy)
+  const title = `${property.type} in ${property.neighborhood}, ${property.city} - KSh ${property.price.toLocaleString()}/month${property.rentalke_visited ? ' | Verified' : ''}${property.video_url ? ' | Video Tour' : ''} | RentalKE`;
+
+  // Create detailed description (more comprehensive than competitors)
+  const description = `${property.type} for rent in ${property.neighborhood}, ${property.city}. KSh ${property.price.toLocaleString()} per month${property.deposit ? ` + KSh ${property.deposit.toLocaleString()} deposit` : ''}. ${property.bedrooms}, ${property.bathroom}. ${property.water_included ? 'Water included in rent. ' : ''}${property.rentalke_visited ? 'Verified by RentalKE team. ' : ''}${property.video_url ? 'Video tour available. ' : ''}${property.security_type ? `Security: ${property.security_type.replace('_', ' ')}. ` : ''}Direct landlord contact: ${property.whatsapp_number}. ${property.description?.slice(0, 120) || ''} Available now.`;
 
   return {
     title,
     description,
     keywords: [
-      `${property.type} ${property.city}`,
+      // Property type + location (high search volume)
       `${property.type} ${property.neighborhood}`,
-      `rental house ${property.neighborhood}`,
-      `${property.bedrooms} ${property.city}`,
+      `${property.type} ${property.city}`,
+      `${property.type.toLowerCase()} ${property.neighborhood}`,
+      `${property.type.toLowerCase()} ${property.city}`,
+
+      // Generic location searches
       `houses for rent ${property.neighborhood}`,
-      `KSh ${property.price} rental`,
+      `rental houses ${property.neighborhood}`,
+      `houses for rent ${property.city}`,
+      `apartments ${property.city}`,
+
+      // Price-specific (HIGH CONVERSION)
+      `${property.price} shillings ${property.city}`,
+      `${property.price} shillings ${property.neighborhood}`,
+      `houses under ${Math.ceil(property.price / 1000) * 1000} ${property.city}`,
+      `affordable housing ${property.neighborhood}`,
+      `cheap houses for rent ${property.city}`,
+
+      // Bedroom-specific
+      `${property.bedrooms} ${property.city}`,
+      `${property.bedrooms} ${property.neighborhood}`,
+      `${property.bedrooms} Mombasa`,
+
+      // Location proximity
+      `houses near ${property.neighborhood}`,
+      `rental houses near ${property.neighborhood}`,
+
+      // Trust signals (competitive advantage)
+      ...(property.rentalke_visited ? ['verified rental Mombasa', 'verified houses Mombasa'] : []),
+      ...(property.video_url ? ['video tour rental Mombasa', 'virtual tour house Mombasa'] : []),
+      ...(property.water_included ? ['water included Mombasa'] : []),
+
+      // Swahili keywords (untapped market)
+      `nyumba ya kupanga ${property.neighborhood}`,
+      `nyumba za kupanga ${property.city}`,
+      `nyumba ${property.city}`,
+      `chumba kupanga ${property.city}`,
     ],
     openGraph: {
       title,
