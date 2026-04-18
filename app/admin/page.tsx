@@ -13,31 +13,38 @@ export default function AdminLoginPage() {
 
   // Check if already logged in
   useEffect(() => {
-    const isAdmin = localStorage.getItem("rentalke_admin");
-    if (isAdmin === "true") {
-      router.push("/admin/dashboard");
-    }
+    fetch("/api/admin/verify")
+      .then((res) => {
+        if (res.ok) {
+          router.push("/admin/dashboard");
+        }
+      })
+      .catch(() => {});
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simple password check (for MVP - will improve later)
-    // Change this password to whatever you want
-    const ADMIN_PASSWORD = "rentalke2026";
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
 
-    // Simulate async operation
-    setTimeout(() => {
-      if (password === ADMIN_PASSWORD) {
-        localStorage.setItem("rentalke_admin", "true");
+      if (res.ok) {
         router.push("/admin/dashboard");
       } else {
         setError("Incorrect password");
         setPassword("");
-        setIsLoading(false);
       }
-    }, 500);
+    } catch {
+      setError("Something went wrong. Try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,15 +100,6 @@ export default function AdminLoginPage() {
                     )}
                   </button>
                 </form>
-
-                <div className="mt-8 pt-6 border-t border-border-gray">
-                  <p className="text-sm text-text-secondary text-center">
-                    Default password: <code className="bg-bg-light px-2 py-1 rounded">rentalke2026</code>
-                  </p>
-                  <p className="text-xs text-text-secondary text-center mt-2">
-                    Change this in the code later for security
-                  </p>
-                </div>
               </div>
             </div>
           </div>

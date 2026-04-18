@@ -6,7 +6,6 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Spinner from "@/components/Spinner";
 import { getProperties } from "@/lib/properties";
-import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/database";
 
 export default function AdminDashboardPage() {
@@ -16,12 +15,15 @@ export default function AdminDashboardPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Check authentication
+  // Check authentication via secure cookie
   useEffect(() => {
-    const isAdmin = localStorage.getItem("rentalke_admin");
-    if (isAdmin !== "true") {
-      router.push("/admin");
-    }
+    fetch("/api/admin/verify")
+      .then((res) => {
+        if (!res.ok) {
+          router.push("/admin");
+        }
+      })
+      .catch(() => router.push("/admin"));
   }, [router]);
 
   // Load properties
@@ -36,43 +38,53 @@ export default function AdminDashboardPage() {
     setLoading(false);
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("rentalke_admin");
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin");
   };
 
   const handleToggleAvailability = async (id: string, currentStatus: boolean) => {
     setUpdatingId(id);
-    const { error } = await supabase
-      .from("properties")
-      .update({ available: !currentStatus })
-      .eq("id", id);
+    try {
+      const res = await fetch("/api/admin/properties", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, available: !currentStatus }),
+      });
 
-    if (error) {
-      console.error("Error updating property:", error);
-      alert("Error updating property. Check console for details.");
+      if (!res.ok) {
+        const data = await res.json();
+        alert(`Error: ${data.error || "Failed to update property"}`);
+      } else {
+        await loadProperties();
+      }
+    } catch {
+      alert("Error updating property. Please try again.");
+    } finally {
       setUpdatingId(null);
-    } else {
-      setUpdatingId(null);
-      await loadProperties(); // Reload properties
     }
   };
 
   const handleDelete = async (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete "${title}"?`)) {
       setDeletingId(id);
-      const { error } = await supabase
-        .from("properties")
-        .delete()
-        .eq("id", id);
+      try {
+        const res = await fetch("/api/admin/properties", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
 
-      if (error) {
-        console.error("Error deleting property:", error);
-        alert("Error deleting property. Check console for details.");
+        if (!res.ok) {
+          const data = await res.json();
+          alert(`Error: ${data.error || "Failed to delete property"}`);
+        } else {
+          await loadProperties();
+        }
+      } catch {
+        alert("Error deleting property. Please try again.");
+      } finally {
         setDeletingId(null);
-      } else {
-        setDeletingId(null);
-        await loadProperties(); // Reload properties
       }
     }
   };
@@ -136,7 +148,7 @@ export default function AdminDashboardPage() {
 
             {loading ? (
               <div className="text-center py-16">
-                <div className="text-4xl mb-4">⏳</div>
+                <div className="text-4xl mb-4">...</div>
                 <p className="text-text-secondary">Loading properties...</p>
               </div>
             ) : properties.length > 0 ? (
@@ -210,7 +222,6 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <div className="text-center py-16">
-                <div className="text-6xl mb-4">🏠</div>
                 <h3 className="text-2xl font-semibold mb-2">No properties yet</h3>
                 <p className="text-text-secondary mb-6">
                   Add your first property to get started

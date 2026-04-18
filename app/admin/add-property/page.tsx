@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
-import { supabase } from "@/lib/supabase";
 
 export default function AddPropertyPage() {
   const router = useRouter();
@@ -28,12 +27,13 @@ export default function AddPropertyPage() {
     nearby_places: "",
   });
 
-  // Check authentication
+  // Check authentication via secure cookie
   useEffect(() => {
-    const isAdmin = localStorage.getItem("rentalke_admin");
-    if (isAdmin !== "true") {
-      router.push("/admin");
-    }
+    fetch("/api/admin/verify")
+      .then((res) => {
+        if (!res.ok) router.push("/admin");
+      })
+      .catch(() => router.push("/admin"));
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,35 +51,43 @@ export default function AddPropertyPage() {
       .map((p) => p.trim())
       .filter((p) => p.length > 0);
 
-    const { error } = await supabase.from("properties").insert([
-      {
-        title: formData.title,
-        description: formData.description || null,
-        city: formData.city,
-        neighborhood: formData.neighborhood,
-        type: formData.type,
-        bedrooms: formData.bedrooms,
-        bathroom: formData.bathroom,
-        price: parseInt(formData.price),
-        deposit: formData.deposit ? parseInt(formData.deposit) : null,
-        water_included: formData.water_included,
-        electricity_cost: formData.electricity_cost || null,
-        landlord_name: formData.landlord_name,
-        landlord_phone: formData.landlord_phone,
-        whatsapp_number: formData.whatsapp_number || null,
-        features,
-        nearby_places,
-        available: true,
-      },
-    ]);
+    try {
+      const res = await fetch("/api/admin/properties/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description || null,
+          city: formData.city,
+          neighborhood: formData.neighborhood,
+          type: formData.type,
+          bedrooms: formData.bedrooms,
+          bathroom: formData.bathroom,
+          price: parseInt(formData.price),
+          deposit: formData.deposit ? parseInt(formData.deposit) : null,
+          water_included: formData.water_included,
+          electricity_cost: formData.electricity_cost || null,
+          landlord_name: formData.landlord_name,
+          landlord_phone: formData.landlord_phone,
+          whatsapp_number: formData.whatsapp_number || null,
+          features,
+          nearby_places,
+          available: true,
+        }),
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error) {
-      alert("Error adding property: " + error.message);
-    } else {
-      alert("Property added successfully!");
-      router.push("/admin/dashboard");
+      if (!res.ok) {
+        const data = await res.json();
+        alert("Error adding property: " + (data.error || "Unknown error"));
+      } else {
+        alert("Property added successfully!");
+        router.push("/admin/dashboard");
+      }
+    } catch {
+      setLoading(false);
+      alert("Error adding property. Please try again.");
     }
   };
 
