@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Spinner from "@/components/Spinner";
-import { getProperties } from "@/lib/properties";
+import { getProperties, clearPropertiesCache } from "@/lib/properties";
 import type { Property } from "@/types/database";
 
 export default function AdminDashboardPage() {
@@ -31,8 +31,9 @@ export default function AdminDashboardPage() {
     loadProperties();
   }, []);
 
-  async function loadProperties() {
+  async function loadProperties(bustCache = false) {
     setLoading(true);
+    if (bustCache) clearPropertiesCache();
     const data = await getProperties();
     setProperties(data);
     setLoading(false);
@@ -56,7 +57,7 @@ export default function AdminDashboardPage() {
         const data = await res.json();
         alert(`Error: ${data.error || "Failed to update property"}`);
       } else {
-        await loadProperties();
+        await loadProperties(true);
       }
     } catch {
       alert("Error updating property. Please try again.");
@@ -79,7 +80,7 @@ export default function AdminDashboardPage() {
           const data = await res.json();
           alert(`Error: ${data.error || "Failed to delete property"}`);
         } else {
-          await loadProperties();
+          await loadProperties(true);
         }
       } catch {
         alert("Error deleting property. Please try again.");

@@ -15,6 +15,14 @@ const cache: {
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 /**
+ * Clear the properties cache (call after admin updates)
+ */
+export function clearPropertiesCache() {
+  cache.properties = null;
+  cache.timestamp = null;
+}
+
+/**
  * Get all properties with optional filters
  */
 export async function getProperties(filters?: PropertyFilters): Promise<Property[]> {

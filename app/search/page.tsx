@@ -15,7 +15,7 @@ export default function SearchPage() {
   const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("all");
-  const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
