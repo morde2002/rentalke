@@ -11,13 +11,15 @@ export interface Property {
   type: string;
   bedrooms: string;
   bathroom: string;
-  price: number;
+  price: number | null;
+  price_min?: number | null;
+  price_max?: number | null;
   deposit: number | null;
   water_included: boolean;
   electricity_cost: string | null;
   available: boolean;
-  landlord_name: string;
-  landlord_phone: string;
+  landlord_name: string | null;
+  landlord_phone: string | null;
   whatsapp_number: string | null;
   images: string[];
   video_url?: string | null;

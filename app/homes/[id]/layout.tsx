@@ -17,10 +17,15 @@ export async function generateMetadata({
   }
 
   // Create SEO-optimized title (mirrors competitor strategy)
-  const title = `${property.type} in ${property.neighborhood}, ${property.city} - KSh ${property.price.toLocaleString()}/month${property.rentalke_visited ? ' | Verified' : ''}${property.video_url ? ' | Video Tour' : ''} | RentalKE`;
+  const priceText = property.price !== null
+    ? `KSh ${property.price.toLocaleString()}/month`
+    : property.price_min != null && property.price_max != null
+    ? `KSh ${property.price_min.toLocaleString()}-${property.price_max.toLocaleString()}/month`
+    : "Price undisclosed";
+  const title = `${property.type} in ${property.neighborhood}, ${property.city} - ${priceText}${property.rentalke_visited ? ' | Verified' : ''}${property.video_url ? ' | Video Tour' : ''} | RentalKE`;
 
   // Create detailed description (more comprehensive than competitors)
-  const description = `${property.type} for rent in ${property.neighborhood}, ${property.city}. KSh ${property.price.toLocaleString()} per month${property.deposit ? ` + KSh ${property.deposit.toLocaleString()} deposit` : ''}. ${property.bedrooms}, ${property.bathroom}. ${property.water_included ? 'Water included in rent. ' : ''}${property.rentalke_visited ? 'Verified by RentalKE team. ' : ''}${property.video_url ? 'Video tour available. ' : ''}${property.security_type ? `Security: ${property.security_type.replace('_', ' ')}. ` : ''}Direct landlord contact: ${property.whatsapp_number}. ${property.description?.slice(0, 120) || ''} Available now.`;
+  const description = `${property.type} for rent in ${property.neighborhood}, ${property.city}. ${priceText}${property.deposit ? ` + KSh ${property.deposit.toLocaleString()} deposit` : ''}. ${property.bedrooms}, ${property.bathroom}. ${property.water_included ? 'Water included in rent. ' : ''}${property.rentalke_visited ? 'Verified by RentalKE team. ' : ''}${property.video_url ? 'Video tour available. ' : ''}${property.security_type ? `Security: ${property.security_type.replace('_', ' ')}. ` : ''}Contact RentalKE for listing details. ${property.description?.slice(0, 120) || ''} Available now.`;
 
   return {
     title,
@@ -39,9 +44,11 @@ export async function generateMetadata({
       `apartments ${property.city}`,
 
       // Price-specific (HIGH CONVERSION)
-      `${property.price} shillings ${property.city}`,
-      `${property.price} shillings ${property.neighborhood}`,
-      `houses under ${Math.ceil(property.price / 1000) * 1000} ${property.city}`,
+      ...(property.price !== null ? [
+        `${property.price} shillings ${property.city}`,
+        `${property.price} shillings ${property.neighborhood}`,
+        `houses under ${Math.ceil(property.price / 1000) * 1000} ${property.city}`,
+      ] : []),
       `affordable housing ${property.neighborhood}`,
       `cheap houses for rent ${property.city}`,
 

@@ -13,6 +13,7 @@ import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
 import type { Property } from "@/types/database";
 import { getPriceCategoryInfo, getPriceCategory } from "@/lib/priceCategory";
+import { RENTALKE_WHATSAPP_NUMBER, getPropertyInquiryUrl } from "@/lib/whatsapp";
 
 export default function PropertyDetailPage({
   params,
@@ -134,19 +135,21 @@ export default function PropertyDetailPage({
       },
       "offers": {
         "@type": "Offer",
-        "price": property.price,
-        "priceCurrency": "KES",
         "availability": property.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-        "priceSpecification": {
+        ...(property.price !== null && {
+          "price": property.price,
+          "priceCurrency": "KES",
+          "priceSpecification": {
           "@type": "UnitPriceSpecification",
           "price": property.price,
           "priceCurrency": "KES",
           "unitText": "MONTH"
-        },
+          }
+        }),
         "seller": {
-          "@type": "Person",
-          "name": property.landlord_name || "Landlord",
-          "telephone": property.whatsapp_number || property.landlord_phone
+          "@type": "Organization",
+          "name": "RentalKE",
+          "telephone": `+${RENTALKE_WHATSAPP_NUMBER}`
         }
       },
       "numberOfRooms": property.bedrooms,
@@ -480,18 +483,22 @@ export default function PropertyDetailPage({
                       )}
                     </div>
                     {(() => {
-                      const categoryInfo = getPriceCategoryInfo(property.price);
-                      const category = getPriceCategory(property.price);
-                      const rangeText = category === 'budget'
+                      const categoryInfo = getPriceCategoryInfo(property.price, property.price_min, property.price_max);
+                      const category = getPriceCategory(property.price, property.price_min, property.price_max);
+                      const rangeText = property.price_min != null && property.price_max != null
+                        ? `Ksh ${property.price_min.toLocaleString()} - ${property.price_max.toLocaleString()}/month`
+                        : category === 'budget'
                         ? 'Under Ksh 7,000/month'
                         : category === 'mid-range'
                         ? 'Ksh 7,000 - 12,000/month'
-                        : 'Over Ksh 12,000/month';
+                        : category === 'premium'
+                        ? 'Over Ksh 12,000/month'
+                        : 'Contact us for rent details';
 
                       return (
                         <div className="flex flex-col items-start gap-2">
                           <span className={`inline-flex items-center pr-4 pl-2 py-2 rounded-full text-lg font-semibold ${categoryInfo.bgClass} ${categoryInfo.colorClass}`}>
-                            Price: {categoryInfo.label}
+                            {categoryInfo.label === "Price undisclosed" ? categoryInfo.label : `Price: ${categoryInfo.label}`}
                           </span>
                           <p className="text-sm text-text-secondary">
                             {rangeText}
@@ -500,7 +507,7 @@ export default function PropertyDetailPage({
                       );
                     })()}
                     <p className="text-base text-text-secondary mt-2">
-                      💬 Contact the landlord via WhatsApp below for exact monthly rent, deposit amount, and payment details.
+                      💬 Contact RentalKE on WhatsApp below for the exact monthly rent, deposit amount, and landlord contact details.
                     </p>
                   </div>
 
@@ -657,25 +664,18 @@ export default function PropertyDetailPage({
 
                     {property.available ? (
                       <>
-                        {property.landlord_name && (
-                          <div className="pb-3 border-b border-border-gray">
-                            <p className="text-sm text-text-secondary">Contact</p>
-                            <p className="text-lg font-medium text-text-primary">{property.landlord_name}</p>
-                          </div>
-                        )}
-
                         <p className="text-text-secondary text-sm">
-                          Message or call to schedule a viewing
+                          Message RentalKE about this home. We’ll share the landlord’s contact details with you.
                         </p>
 
-                        {property.whatsapp_number && (
-                          <button
+                        <button
                             onClick={() => {
                               if (!isWhatsAppLoading) {
                                 setIsWhatsAppLoading(true);
                                 window.open(
-                                  `https://wa.me/${property.whatsapp_number}?text=Hi, I'm interested in the ${property.type} in ${property.neighborhood} for Ksh ${property.price.toLocaleString()}/month. Can I schedule a viewing?`,
-                                  "_blank"
+                                  getPropertyInquiryUrl(property),
+                                  "_blank",
+                                  "noopener,noreferrer",
                                 );
                                 setTimeout(() => setIsWhatsAppLoading(false), 1000);
                               }
@@ -690,28 +690,15 @@ export default function PropertyDetailPage({
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                               </svg>
                             )}
-                            <span className="hidden sm:inline">Message on WhatsApp</span>
-                            <span className="sm:hidden">WhatsApp</span>
-                          </button>
-                        )}
-
-                        <div className="text-center text-sm text-text-secondary my-2">
-                          or call
-                        </div>
-
-                        <a
-                          href={`tel:${property.landlord_phone}`}
-                          className="btn-secondary w-full text-center block"
-                        >
-                          <span className="truncate">{property.landlord_phone}</span>
-                        </a>
+                            <span>Contact me on WhatsApp</span>
+                        </button>
 
                         <div className="pt-4 border-t border-border-gray">
                           <div className="flex items-center gap-2 text-sm text-text-secondary">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>Landlord usually replies in 1 hour</span>
+                            <span>RentalKE will help connect you about this listing</span>
                           </div>
                         </div>
                       </>

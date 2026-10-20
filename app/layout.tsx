@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "Houses & Apartments For Rent in Mombasa, Nairobi, Kenya | RentalKE",
     template: "%s | RentalKE - Verified Rental Houses Kenya"
   },
-  description: "Affordable Houses & Apartments For Rent in Mombasa, Kenya. Double Rooms from KSh 5,500/month. 1 Bedroom from KSh 8,000/month. Verified properties in Approved, Vijiweni. Direct landlord contact, no agents. Real photos, video tours, updated daily.",
+  description: "Find affordable rental houses and apartments in Mombasa, Kenya. Browse verified listings and message RentalKE on WhatsApp for property details and landlord referrals.",
   keywords: [
     // Primary keywords with exact prices (HIGH CONVERSION)
     "rental houses Kenya",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     "verified rental houses Mombasa",
     "verified landlords Kenya",
     "no agent rental houses",
-    "direct landlord contact Kenya",
+    "rental listing referrals Kenya",
     "video tour rental Mombasa",
     "water included rental Mombasa",
     "gated compound Mombasa",
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   openGraph: {
     title: "Houses & Apartments For Rent in Mombasa, Nairobi, Kenya | RentalKE",
-    description: "Affordable Houses & Apartments For Rent in Mombasa, Kenya. Double Rooms from KSh 5,500/month. 1 Bedroom from KSh 8,000/month. Verified properties in Approved, Vijiweni. Direct landlord contact, no agents. Video tours available.",
+    description: "Find affordable rental houses and apartments in Mombasa, Kenya. Browse verified listings and message RentalKE on WhatsApp for property details and landlord referrals.",
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.com',
     siteName: "RentalKE",
     images: [
@@ -105,7 +105,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Houses & Apartments For Rent in Mombasa, Nairobi, Kenya | RentalKE",
-    description: "Affordable Houses & Apartments For Rent in Mombasa. Double Rooms from KSh 5,500/month. Verified properties with video tours. Direct landlord contact, no agents.",
+    description: "Affordable Houses & Apartments For Rent in Mombasa. Browse verified listings with video tours and contact RentalKE on WhatsApp for details.",
     images: ["/og-image.png"],
     creator: "@rentalke",
   },

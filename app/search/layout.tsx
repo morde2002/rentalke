@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Search Rental Houses in Mombasa, Kenya | RentalKE',
-  description: 'Search affordable rental houses and apartments in Mombasa, Kenya. Double rooms from KSh 5,500/month, 1 bedrooms from KSh 8,000/month. Filter by price, location, and type. Verified properties in Approved, Vijiweni, and more. Direct landlord contact, no agents.',
+  description: 'Search affordable rental houses and apartments in Mombasa, Kenya. Filter by price range, location, and type. View verified properties in Approved, Vijiweni, and more. Contact RentalKE for listing details and landlord referrals.',
   keywords: [
     'search rental houses Mombasa',
     'find houses for rent Mombasa',

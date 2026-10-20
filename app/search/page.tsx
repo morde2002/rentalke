@@ -89,8 +89,9 @@ export default function SearchPage() {
     if (selectedNeighborhood !== "all" && property.neighborhood !== selectedNeighborhood) return false;
 
     // Filter by price category
-    const propertyCategory = getPriceCategory(property.price);
-    if (!selectedCategories.includes(propertyCategory)) return false;
+    const propertyCategory = getPriceCategory(property.price, property.price_min, property.price_max);
+    if (propertyCategory && !selectedCategories.includes(propertyCategory)) return false;
+    if (!propertyCategory && selectedCategories.length < 3) return false;
 
     return true;
   });
@@ -390,6 +391,8 @@ export default function SearchPage() {
                           id={property.id}
                           title={property.title}
                           price={property.price}
+                          priceMin={property.price_min}
+                          priceMax={property.price_max}
                           location={property.city}
                           neighborhood={property.neighborhood}
                           type={property.type}
@@ -397,7 +400,6 @@ export default function SearchPage() {
                           bathroom={property.bathroom}
                           images={property.images || []}
                           available={property.available}
-                          whatsappNumber={property.whatsapp_number}
                           phoneVerified={property.phone_verified}
                           idVerified={property.id_verified}
                           addressVerified={property.address_verified}

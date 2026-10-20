@@ -18,7 +18,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
-              Find affordable rental homes in Kenya. No agents, no stress. Connect directly with landlords and find your next home in minutes.
+              Find affordable rental homes in Kenya. Message RentalKE about a listing and we’ll help you get in touch.
             </p>
           </div>
 

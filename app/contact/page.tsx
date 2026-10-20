@@ -134,7 +134,7 @@ export default function ContactPage() {
                         How do I contact landlords?
                       </h4>
                       <p className="text-text-secondary text-sm">
-                        Every property listing has a WhatsApp button and phone number. Connect directly with landlords - no agents involved.
+                        Use the WhatsApp contact button on a listing to message RentalKE with the property details. We’ll help connect you with the listing contact.
                       </p>
                     </div>
 

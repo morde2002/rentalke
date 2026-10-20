@@ -5,9 +5,16 @@ export function generatePropertyTitle(property: {
   bedrooms: string;
   neighborhood: string;
   city: string;
-  price: number;
+  price: number | null;
+  price_min?: number | null;
+  price_max?: number | null;
 }): string {
-  return `${property.type} ${property.bedrooms} in ${property.neighborhood}, ${property.city} - Ksh ${property.price.toLocaleString()}/month`;
+  const priceText = property.price !== null
+    ? `Ksh ${property.price.toLocaleString()}/month`
+    : property.price_min != null && property.price_max != null
+    ? `Ksh ${property.price_min.toLocaleString()}-${property.price_max.toLocaleString()}/month`
+    : "Price undisclosed";
+  return `${property.type} ${property.bedrooms} in ${property.neighborhood}, ${property.city} - ${priceText}`;
 }
 
 export function generatePropertyDescription(property: {
@@ -16,7 +23,9 @@ export function generatePropertyDescription(property: {
   bathroom: string;
   neighborhood: string;
   city: string;
-  price: number;
+  price: number | null;
+  price_min?: number | null;
+  price_max?: number | null;
   available: boolean;
   description?: string;
 }): string {
@@ -25,7 +34,12 @@ export function generatePropertyDescription(property: {
     ? property.description.substring(0, 120)
     : `${property.type} with ${property.bedrooms} and ${property.bathroom} for rent in ${property.neighborhood}, ${property.city}.`;
 
-  return `${desc} ${availability}. Ksh ${property.price.toLocaleString()}/month. Direct landlord contact, no agent fees. Verified listing.`;
+  const priceText = property.price !== null
+    ? `Ksh ${property.price.toLocaleString()}/month`
+    : property.price_min != null && property.price_max != null
+    ? `Ksh ${property.price_min.toLocaleString()}-${property.price_max.toLocaleString()}/month`
+    : "Price undisclosed";
+  return `${desc} ${availability}. ${priceText}. Contact RentalKE for listing details. Verified listing.`;
 }
 
 export function generatePropertyKeywords(property: {
@@ -33,7 +47,7 @@ export function generatePropertyKeywords(property: {
   bedrooms: string;
   neighborhood: string;
   city: string;
-  price: number;
+  price: number | null;
 }): string {
   const typeKeywords = {
     "Bedsitter": "bedsitter, single room, studio",
@@ -48,7 +62,7 @@ export function generatePropertyKeywords(property: {
     `houses for rent ${property.city}`,
     typeKeywords,
     `affordable rentals ${property.city}`,
-    `${property.price < 7000 ? 'cheap' : 'affordable'} ${property.type}`,
+    `${property.price !== null && property.price < 7000 ? 'cheap' : 'affordable'} ${property.type}`,
     `verified landlord ${property.city}`,
     `no agent ${property.type}`,
   ].join(", ");

@@ -173,7 +173,11 @@ export default function AdminDashboardPage() {
                           {property.neighborhood}, {property.city} • {property.type}
                         </p>
                         <p className="text-lg font-semibold text-primary-blue">
-                          Ksh {property.price.toLocaleString()}/month
+                          {property.price !== null
+                            ? `Ksh ${property.price.toLocaleString()}/month`
+                            : property.price_min != null && property.price_max != null
+                            ? `Ksh ${property.price_min.toLocaleString()}-${property.price_max.toLocaleString()}/month`
+                            : "Price undisclosed"}
                         </p>
                       </div>
 
