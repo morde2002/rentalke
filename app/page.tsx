@@ -269,6 +269,18 @@ export default function HomePage() {
                   Show Me Homes
                 </button>
               </form>
+
+              <div className="flex items-center gap-3 my-4 px-3 text-sm text-text-secondary">
+                <span className="h-px flex-1 bg-border-gray" />
+                <span>or</span>
+                <span className="h-px flex-1 bg-border-gray" />
+              </div>
+              <Link
+                href="/real-estate"
+                className="inline-flex items-center justify-center rounded-full bg-primary-blue px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
+              >
+                Real Estate Homes
+              </Link>
             </div>
 
             {/* Trust Indicators */}
