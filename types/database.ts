@@ -15,7 +15,7 @@ export interface Property {
   price_min?: number | null;
   price_max?: number | null;
   deposit: number | null;
-  water_included: boolean;
+  water_included: boolean | null;
   electricity_cost: string | null;
   available: boolean;
   landlord_name: string | null;

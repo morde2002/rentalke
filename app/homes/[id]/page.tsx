@@ -570,7 +570,9 @@ export default function PropertyDetailPage({
                           Water:
                         </span>
                         <span className="text-text-primary font-medium">
-                          {property.water_included
+                          {property.water_included === null
+                            ? "Ask the landlord"
+                            : property.water_included
                             ? "Included in rent"
                             : "Pay separately"}
                         </span>
