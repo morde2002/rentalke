@@ -277,7 +277,7 @@ export default function HomePage() {
               </div>
               <Link
                 href="/real-estate"
-                className="inline-flex items-center justify-center rounded-full bg-primary-blue px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
+                className="inline-flex min-h-12 w-full max-w-2xl items-center justify-center rounded-full bg-primary-blue px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
               >
                 Real Estate Homes
               </Link>
