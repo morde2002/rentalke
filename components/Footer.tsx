@@ -52,7 +52,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/real-estate/advertise"
+                  href="/real-estate#pricing"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Advertise a Property

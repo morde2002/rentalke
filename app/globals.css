@@ -148,4 +148,26 @@
     opacity: 1 !important;
     transform: none !important;
   }
+
+  .real-estate-tab-panel {
+    animation: real-estate-tab-enter 180ms ease-out;
+  }
+
+  @keyframes real-estate-tab-enter {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .real-estate-tab-panel {
+      animation: none;
+    }
+  }
 }
