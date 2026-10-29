@@ -37,7 +37,8 @@ export default function AdminLoginPage() {
       if (res.ok) {
         router.push("/admin/dashboard");
       } else {
-        setError("Incorrect password");
+        const data = await res.json();
+        setError(data.error || "Unable to log in");
         setPassword("");
       }
     } catch {

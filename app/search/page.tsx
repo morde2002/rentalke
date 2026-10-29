@@ -7,7 +7,7 @@ import DemoBanner from "@/components/DemoBanner";
 import ScrollReveal from "@/components/ScrollReveal";
 import PropertyCardGrid from "@/components/PropertyCardGrid";
 import { getProperties } from "@/lib/properties";
-import type { Property } from "@/types/database";
+import type { PublicProperty } from "@/types/database";
 import { getPriceCategory, type PriceCategory } from "@/lib/priceCategory";
 
 export default function SearchPage() {
@@ -16,7 +16,7 @@ export default function SearchPage() {
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("all");
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<PublicProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const propertiesPerPage = 20;

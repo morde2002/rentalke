@@ -11,7 +11,7 @@ import PropertyHighlights from "@/components/PropertyHighlights";
 import StarRating from "@/components/StarRating";
 import Link from "next/link";
 import { getPropertyById } from "@/lib/properties";
-import type { Property } from "@/types/database";
+import type { PublicProperty } from "@/types/database";
 import { getPriceCategoryInfo, getPriceCategory } from "@/lib/priceCategory";
 import { RENTALKE_WHATSAPP_NUMBER, getPropertyInquiryUrl } from "@/lib/whatsapp";
 
@@ -21,7 +21,7 @@ export default function PropertyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [property, setProperty] = useState<Property | null>(null);
+  const [property, setProperty] = useState<PublicProperty | null>(null);
   const [loading, setLoading] = useState(true);
   const [isWhatsAppLoading, setIsWhatsAppLoading] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);

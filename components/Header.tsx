@@ -26,7 +26,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6">
             {pathname !== "/" && (
               <Link
                 href="/"
@@ -44,6 +44,16 @@ export default function Header() {
               }`}
             >
               Find a Home
+            </Link>
+            <Link
+              href="/real-estate"
+              className={`transition-colors ${
+                pathname.startsWith("/real-estate")
+                  ? "text-primary-blue font-black"
+                  : "text-primary-blue hover:text-primary-blue-hover"
+              }`}
+            >
+              Real Estate
             </Link>
             <Link
               href="/contact"
@@ -69,14 +79,14 @@ export default function Header() {
 
           {/* CTA Button */}
           <div className="flex items-center space-x-4">
-            <Link href="/landlords" className="btn-primary hidden md:block">
+            <Link href="/landlords" className="btn-primary hidden lg:block">
               List Your House
             </Link>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-text-secondary relative w-10 h-10 flex items-center justify-center"
+              className="lg:hidden p-2 text-text-secondary relative w-10 h-10 flex items-center justify-center"
               aria-label="Toggle menu"
             >
               <span className="sr-only">Toggle menu</span>
@@ -105,7 +115,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden ${
           mobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -129,6 +139,17 @@ export default function Header() {
             }`}
           >
             Find a Home
+          </Link>
+          <Link
+            href="/real-estate"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`block text-center py-3 rounded-card transition-colors ${
+              pathname.startsWith("/real-estate")
+                ? "text-primary-blue font-black bg-bg-light"
+                : "text-primary-blue hover:text-primary-blue-hover hover:bg-bg-light"
+            }`}
+          >
+            Real Estate
           </Link>
           <Link
             href="/contact"

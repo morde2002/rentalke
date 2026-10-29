@@ -12,7 +12,7 @@ import VerificationBadges from "@/components/VerificationBadges";
 import StarRating from "@/components/StarRating";
 import { getProperties } from "@/lib/properties";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
-import type { Property } from "@/types/database";
+import type { PublicProperty } from "@/types/database";
 import Link from "next/link";
 import { getPriceCategoryInfo } from "@/lib/priceCategory";
 import { getPropertyInquiryUrl } from "@/lib/whatsapp";
@@ -33,7 +33,7 @@ export default function HomePage() {
   const [searchLocation, setSearchLocation] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<PublicProperty[]>([]);
   const [loadingProperties, setLoadingProperties] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentPropertyIndex, setCurrentPropertyIndex] = useState(0);
@@ -279,7 +279,7 @@ export default function HomePage() {
                 href="/real-estate"
                 className="inline-flex min-h-12 w-full max-w-2xl items-center justify-center rounded-full bg-primary-blue px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
               >
-                Real Estate Homes
+                Explore Real Estate
               </Link>
             </div>
 

@@ -57,6 +57,17 @@ export interface Property {
   total_ratings?: number | null; // Total number of ratings
 }
 
+export type PublicProperty = Omit<
+  Property,
+  | "landlord_name"
+  | "landlord_phone"
+  | "whatsapp_number"
+  | "verified_by"
+  | "landlord_id_number"
+  | "landlord_alt_phone"
+  | "landlord_physical_address"
+>;
+
 export interface PropertyInsert {
   title: string;
   description?: string;
@@ -85,4 +96,26 @@ export interface PropertyFilters {
   minPrice?: number;
   maxPrice?: number;
   available?: boolean;
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      properties: {
+        Row: Property;
+        Insert: Partial<Property>;
+        Update: Partial<Property>;
+        Relationships: [];
+      };
+    };
+    Views: {
+      public_properties: {
+        Row: PublicProperty;
+        Relationships: [];
+      };
+    };
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
 }

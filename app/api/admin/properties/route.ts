@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-
-async function verifyAdmin(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  return Boolean(session?.value);
-}
+import { isAdminAuthenticated } from "@/lib/admin-auth";
 
 // PATCH - Toggle property availability
 export async function PATCH(request: NextRequest) {
-  if (!(await verifyAdmin())) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,7 +24,7 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE - Delete a property
 export async function DELETE(request: NextRequest) {
-  if (!(await verifyAdmin())) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -46,4 +40,22 @@ export async function DELETE(request: NextRequest) {
   }
 
   return NextResponse.json({ success: true });
+}
+
+export async function GET() {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("properties")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching admin properties:", error);
+    return NextResponse.json({ error: "Unable to load properties" }, { status: 500 });
+  }
+
+  return NextResponse.json({ properties: data });
 }

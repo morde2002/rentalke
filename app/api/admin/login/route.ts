@@ -1,35 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import crypto from "crypto";
-
-function generateSessionToken(): string {
-  return crypto.randomBytes(32).toString("hex");
-}
+import { adminSessionCookie, adminSessionMaxAge, createAdminSessionToken } from "@/lib/admin-auth";
 
 export async function POST(request: NextRequest) {
-  const { password } = await request.json();
+  let body: { password?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
 
   const adminPassword = process.env.ADMIN_PASSWORD;
+  const sessionToken = createAdminSessionToken();
 
-  if (!adminPassword) {
+  if (!adminPassword || !sessionToken) {
     return NextResponse.json(
-      { error: "Admin password not configured" },
+      { error: "Admin authentication is not configured" },
       { status: 500 }
     );
   }
 
-  if (password !== adminPassword) {
+  if (typeof body.password !== "string" || body.password !== adminPassword) {
     return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
   }
 
-  const sessionToken = generateSessionToken();
-
   const cookieStore = await cookies();
-  cookieStore.set("admin_session", sessionToken, {
+  cookieStore.set(adminSessionCookie, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: adminSessionMaxAge,
     path: "/",
   });
 

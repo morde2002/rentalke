@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Spinner from "@/components/Spinner";
-import { getProperties, clearPropertiesCache } from "@/lib/properties";
 import type { Property } from "@/types/database";
 
 export default function AdminDashboardPage() {
@@ -31,12 +30,26 @@ export default function AdminDashboardPage() {
     loadProperties();
   }, []);
 
-  async function loadProperties(bustCache = false) {
+  async function loadProperties() {
     setLoading(true);
-    if (bustCache) clearPropertiesCache();
-    const data = await getProperties();
-    setProperties(data);
-    setLoading(false);
+    try {
+      const response = await fetch("/api/admin/properties", { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error("Unable to load properties");
+      }
+
+      const data: { properties?: Property[] } = await response.json();
+      if (!Array.isArray(data.properties)) {
+        throw new Error("Invalid properties response");
+      }
+
+      setProperties(data.properties);
+    } catch (error) {
+      console.error("Error loading admin properties:", error);
+      alert("Unable to load properties. Please refresh and try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleLogout = async () => {
@@ -57,7 +70,7 @@ export default function AdminDashboardPage() {
         const data = await res.json();
         alert(`Error: ${data.error || "Failed to update property"}`);
       } else {
-        await loadProperties(true);
+        await loadProperties();
       }
     } catch {
       alert("Error updating property. Please try again.");
@@ -80,7 +93,7 @@ export default function AdminDashboardPage() {
           const data = await res.json();
           alert(`Error: ${data.error || "Failed to delete property"}`);
         } else {
-          await loadProperties(true);
+          await loadProperties();
         }
       } catch {
         alert("Error deleting property. Please try again.");

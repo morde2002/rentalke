@@ -44,6 +44,22 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/real-estate"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Real Estate
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/real-estate/advertise"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Advertise a Property
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/landlords"
                   className="text-gray-400 hover:text-white transition-colors"
                 >

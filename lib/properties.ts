@@ -1,11 +1,54 @@
 // Database queries for properties
 
 import { supabase } from './supabase';
-import type { Property, PropertyFilters } from '@/types/database';
+import type { PropertyFilters, PublicProperty } from '@/types/database';
+
+const PUBLIC_PROPERTY_COLUMNS = [
+  'id',
+  'created_at',
+  'updated_at',
+  'title',
+  'description',
+  'city',
+  'neighborhood',
+  'type',
+  'bedrooms',
+  'bathroom',
+  'price',
+  'price_min',
+  'price_max',
+  'deposit',
+  'water_included',
+  'electricity_cost',
+  'available',
+  'images',
+  'video_url',
+  'features',
+  'nearby_places',
+  'additional_info',
+  'google_maps_url',
+  'phone_verified',
+  'id_verified',
+  'address_verified',
+  'rentalke_visited',
+  'verified_at',
+  'payment_method',
+  'paybill_number',
+  'till_number',
+  'business_name',
+  'water_source',
+  'water_payment',
+  'electricity_type',
+  'electricity_payment',
+  'security_type',
+  'security_details',
+  'average_rating',
+  'total_ratings',
+].join(',');
 
 // Simple in-memory cache
 const cache: {
-  properties: Property[] | null;
+  properties: PublicProperty[] | null;
   timestamp: number | null;
 } = {
   properties: null,
@@ -25,7 +68,7 @@ export function clearPropertiesCache() {
 /**
  * Get all properties with optional filters
  */
-export async function getProperties(filters?: PropertyFilters): Promise<Property[]> {
+export async function getProperties(filters?: PropertyFilters): Promise<PublicProperty[]> {
   // Use cache if available and not expired (only for unfiltered requests)
   const now = Date.now();
   if (!filters && cache.properties && cache.timestamp && (now - cache.timestamp) < CACHE_DURATION) {
@@ -33,7 +76,7 @@ export async function getProperties(filters?: PropertyFilters): Promise<Property
   }
   let query = supabase
     .from('properties')
-    .select('*')
+    .select(PUBLIC_PROPERTY_COLUMNS)
     .order('created_at', { ascending: false });
 
   // Apply filters
@@ -80,10 +123,10 @@ export async function getProperties(filters?: PropertyFilters): Promise<Property
 /**
  * Get a single property by ID
  */
-export async function getPropertyById(id: string): Promise<Property | null> {
+export async function getPropertyById(id: string): Promise<PublicProperty | null> {
   const { data, error } = await supabase
     .from('properties')
-    .select('*')
+    .select(PUBLIC_PROPERTY_COLUMNS)
     .eq('id', id)
     .single();
 
@@ -101,7 +144,7 @@ export async function getPropertyById(id: string): Promise<Property | null> {
 export async function getAvailablePropertiesCount(): Promise<number> {
   const { count, error } = await supabase
     .from('properties')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('available', true);
 
   if (error) {
@@ -115,10 +158,10 @@ export async function getAvailablePropertiesCount(): Promise<number> {
 /**
  * Search properties by text (searches title, description, city, neighborhood)
  */
-export async function searchProperties(searchText: string): Promise<Property[]> {
+export async function searchProperties(searchText: string): Promise<PublicProperty[]> {
   const { data, error } = await supabase
     .from('properties')
-    .select('*')
+    .select(PUBLIC_PROPERTY_COLUMNS)
     .textSearch('search_vector', searchText)
     .order('created_at', { ascending: false });
 
