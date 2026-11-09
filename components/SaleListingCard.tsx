@@ -1,11 +1,6 @@
-import ImageCarousel from "@/components/ImageCarousel";
+import Image from "next/image";
+import Link from "next/link";
 import type { SaleListing } from "@/types/real-estate";
-
-function getWhatsAppUrl(listing: SaleListing) {
-  const phone = listing.contact_phone.replace(/\D/g, "");
-  const message = `Hi, I'm interested in ${listing.title} in ${listing.neighborhood}, ${listing.city}. Please share more details.`;
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-}
 
 export default function SaleListingCard({
   listing,
@@ -13,105 +8,61 @@ export default function SaleListingCard({
   listing: SaleListing;
 }) {
   return (
-    <article className="rounded-card border border-border-gray bg-white p-4 sm:p-6">
-      {listing.images.length > 0 && (
-        <ImageCarousel images={listing.images} title={listing.title} />
-      )}
-
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div>
-          <p className="text-sm font-semibold text-primary-blue">
-            {listing.property_type} for sale
-          </p>
-          <h2 className="mt-1 text-xl font-semibold text-text-primary sm:text-2xl">
-            {listing.title}
-          </h2>
-          <p className="mt-2 text-sm text-text-secondary">
-            {listing.neighborhood}, {listing.city}
-          </p>
-          <p className="mt-4 text-2xl font-bold text-text-primary">
-            KSh {listing.price.toLocaleString("en-KE")}
-          </p>
-          <p className="mt-3 leading-7 text-text-secondary">
-            {listing.description}
-          </p>
-
-          <dl className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-            <div className="rounded-card bg-bg-light p-3">
-              <dt className="text-text-secondary">Bedrooms</dt>
-              <dd className="mt-1 font-semibold text-text-primary">
-                {listing.bedrooms}
-              </dd>
-            </div>
-            <div className="rounded-card bg-bg-light p-3">
-              <dt className="text-text-secondary">Bathrooms</dt>
-              <dd className="mt-1 font-semibold text-text-primary">
-                {listing.bathrooms ?? "Not specified"}
-              </dd>
-            </div>
-            {listing.land_area_details && (
-              <div className="rounded-card bg-bg-light p-3">
-                <dt className="text-text-secondary">Land size</dt>
-                <dd className="mt-1 font-semibold text-text-primary">
-                  {listing.land_area_details}
-                </dd>
-              </div>
-            )}
-          </dl>
-
-          {listing.features.length > 0 && (
-            <ul className="mt-5 flex flex-wrap gap-2">
-              {listing.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="rounded-full bg-bg-light px-3 py-1 text-sm text-text-secondary"
-                >
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {listing.google_maps_url && (
-            <a
-              href={listing.google_maps_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-block text-sm font-medium text-primary-blue hover:underline"
-            >
-              Open location in Google Maps
-            </a>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          {listing.video_url && (
-            <video
-              className="w-full rounded-card bg-black"
-              controls
-              preload="metadata"
-              playsInline
-              src={listing.video_url}
-              aria-label={`Video tour of ${listing.title}`}
-            />
-          )}
-          <div className="flex flex-col gap-3">
-            <a
-              href={`tel:${listing.contact_phone}`}
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-border-gray px-5 py-3 text-sm font-semibold text-text-primary hover:bg-bg-light"
-            >
-              Call seller
-            </a>
-            <a
-              href={getWhatsAppUrl(listing)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-blue px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-blue-hover"
-            >
-              Contact on WhatsApp
-            </a>
+    <article className="flex h-full flex-col overflow-hidden rounded-[20px] border border-border-gray bg-white">
+      <Link
+        href={`/real-estate/listings/${listing.slug}`}
+        className="group relative block aspect-[4/3] bg-bg-light"
+        aria-label={`View ${listing.title}`}
+      >
+        {listing.images[0] ? (
+          <Image
+            src={listing.images[0]}
+            alt={listing.title}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-4xl text-text-secondary">
+            🏠
           </div>
+        )}
+        {listing.images.length > 1 && (
+          <span className="absolute bottom-2 right-2 rounded-full bg-black/65 px-2 py-1 text-xs font-medium text-white">
+            {listing.images.length} photos
+          </span>
+        )}
+        <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-primary-blue">
+          For sale
+        </span>
+      </Link>
+
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <p className="text-sm font-bold text-text-primary sm:text-base">
+          KSh {listing.price.toLocaleString("en-KE")}
+        </p>
+        <Link
+          href={`/real-estate/listings/${listing.slug}`}
+          className="mt-1 line-clamp-2 text-sm font-semibold text-text-primary hover:text-primary-blue sm:text-base"
+        >
+          {listing.title}
+        </Link>
+        <p className="mt-1 line-clamp-1 text-xs text-text-secondary sm:text-sm">
+          {listing.neighborhood}, {listing.city}
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-text-secondary">
+          <span>{listing.bedrooms} bedrooms</span>
+          {listing.bathrooms !== null && <span>{listing.bathrooms} bathrooms</span>}
+          {listing.furnished && <span>Furnished</span>}
         </div>
+
+        <Link
+          href={`/real-estate/listings/${listing.slug}`}
+          className="mt-auto inline-flex min-h-9 items-center justify-center rounded-card border border-primary-blue px-3 py-2 text-xs font-semibold text-primary-blue transition-colors hover:bg-primary-blue hover:text-white sm:mt-4"
+        >
+          View Details
+        </Link>
       </div>
     </article>
   );

@@ -1,5 +1,6 @@
 export interface SaleListing {
   id: string;
+  slug: string;
   title: string;
   description: string;
   city: string;

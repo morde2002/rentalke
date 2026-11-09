@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import SaleListingCard from "@/components/SaleListingCard";
 import type { SaleListing } from "@/types/real-estate";
 
 type RealEstateTab = "listings" | "pricing";
+
+const LISTINGS_PER_PAGE = 20;
+const MIN_PRICE_SLIDER_MAX = 100_000_000;
+const propertyTypes = ["House", "Apartment", "Villa", "Land", "Commercial property"];
 
 const packages = [
   {
@@ -65,22 +69,28 @@ const packages = [
   },
 ];
 
-const propertyTypes = ["House", "Apartment", "Villa", "Land", "Commercial property"];
-
 interface ListingFiltersValue {
   location: string;
   propertyType: string;
   minPrice: string;
   maxPrice: string;
+  minBedrooms: string;
 }
 
 function ListingFilters({
   value,
   onChange,
+  sliderMax,
 }: {
   value: ListingFiltersValue;
   onChange: (filters: ListingFiltersValue) => void;
+  sliderMax: number;
 }) {
+  const update = (changes: Partial<ListingFiltersValue>) =>
+    onChange({ ...value, ...changes });
+  const formatPrice = (price: number) =>
+    `KSh ${price.toLocaleString("en-KE", { maximumFractionDigits: 0 })}`;
+
   return (
     <div className="space-y-4 rounded-card border border-border-gray bg-white p-3">
       <div>
@@ -88,7 +98,7 @@ function ListingFilters({
         <input
           type="search"
           value={value.location}
-          onChange={(event) => onChange({ ...value, location: event.target.value })}
+          onChange={(event) => update({ location: event.target.value })}
           placeholder="City or neighbourhood"
           aria-label="Filter by city or neighbourhood"
           className="input-field min-h-10 px-3 py-2 text-sm"
@@ -103,7 +113,7 @@ function ListingFilters({
               type="radio"
               name="real-estate-type"
               checked={!value.propertyType}
-              onChange={() => onChange({ ...value, propertyType: "" })}
+              onChange={() => update({ propertyType: "" })}
               className="h-4 w-4 text-primary-blue focus:ring-2 focus:ring-primary-blue"
             />
             All Types
@@ -118,7 +128,7 @@ function ListingFilters({
                 name="real-estate-type"
                 value={type}
                 checked={value.propertyType === type}
-                onChange={() => onChange({ ...value, propertyType: type })}
+                onChange={() => update({ propertyType: type })}
                 className="h-4 w-4 text-primary-blue focus:ring-2 focus:ring-primary-blue"
               />
               {type}
@@ -128,33 +138,104 @@ function ListingFilters({
       </div>
 
       <div>
+        <h3 className="mb-2 text-sm font-semibold text-text-primary">Bedrooms</h3>
+        <select
+          value={value.minBedrooms}
+          onChange={(event) => update({ minBedrooms: event.target.value })}
+          aria-label="Filter by minimum bedrooms"
+          className="input-field min-h-10 px-3 py-2 text-sm"
+        >
+          <option value="">Any number</option>
+          {[1, 2, 3, 4, 5, 6].map((bedrooms) => (
+            <option key={bedrooms} value={bedrooms}>
+              {bedrooms}+ bedrooms
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
         <h3 className="mb-2 text-sm font-semibold text-text-primary">Price Range (KSh)</h3>
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-          <label className="text-xs text-text-secondary">
-            Minimum
-            <input
-              type="number"
-              min="0"
-              inputMode="numeric"
-              value={value.minPrice}
-              onChange={(event) => onChange({ ...value, minPrice: event.target.value })}
-              placeholder="No minimum"
-              className="input-field mt-1 min-h-10 px-3 py-2 text-xs"
-            />
-          </label>
-          <label className="text-xs text-text-secondary">
-            Maximum
-            <input
-              type="number"
-              min="0"
-              inputMode="numeric"
-              value={value.maxPrice}
-              onChange={(event) => onChange({ ...value, maxPrice: event.target.value })}
-              placeholder="No maximum"
-              className="input-field mt-1 min-h-10 px-3 py-2 text-xs"
-            />
-          </label>
+          <div className="space-y-2">
+            <label className="block text-xs text-text-secondary">
+              Minimum
+              <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                value={value.minPrice}
+                onChange={(event) => update({ minPrice: event.target.value })}
+                placeholder="No minimum"
+                className="input-field mt-1 min-h-10 px-3 py-2 text-xs"
+              />
+            </label>
+            <div>
+              <div className="flex justify-between text-[10px] text-text-secondary">
+                <span>Price slider</span>
+                <span>{value.minPrice ? formatPrice(Number(value.minPrice)) : "No minimum"}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={sliderMax}
+                step={Math.max(100_000, Math.round(sliderMax / 1000))}
+                value={Math.min(Number(value.minPrice) || 0, sliderMax)}
+                onChange={(event) =>
+                  update({ minPrice: event.target.value === "0" ? "" : event.target.value })
+                }
+                aria-label="Minimum price slider"
+                className="mt-1 h-2 w-full cursor-pointer accent-primary-blue"
+              />
+              <div className="flex justify-between text-[10px] text-text-secondary">
+                <span>No minimum</span>
+                <span>{formatPrice(sliderMax)}+</span>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="block text-xs text-text-secondary">
+              Maximum
+              <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                value={value.maxPrice}
+                onChange={(event) => update({ maxPrice: event.target.value })}
+                placeholder="No maximum"
+                className="input-field mt-1 min-h-10 px-3 py-2 text-xs"
+              />
+            </label>
+            <div>
+              <div className="flex justify-between text-[10px] text-text-secondary">
+                <span>Price slider</span>
+                <span>{value.maxPrice ? formatPrice(Number(value.maxPrice)) : "No maximum"}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={sliderMax}
+                step={Math.max(100_000, Math.round(sliderMax / 1000))}
+                value={value.maxPrice ? Math.min(Number(value.maxPrice), sliderMax) : sliderMax}
+                onChange={(event) =>
+                  update({
+                    maxPrice:
+                      event.target.value === String(sliderMax) ? "" : event.target.value,
+                  })
+                }
+                aria-label="Maximum price slider"
+                className="mt-1 h-2 w-full cursor-pointer accent-primary-blue"
+              />
+              <div className="flex justify-between text-[10px] text-text-secondary">
+                <span>{formatPrice(0)}</span>
+                <span>No maximum</span>
+              </div>
+            </div>
+          </div>
         </div>
+        <p className="mt-2 text-[10px] leading-4 text-text-secondary">
+          Drag to set a price, or type an exact amount above. The slider scales to the listings.
+        </p>
       </div>
     </div>
   );
@@ -176,11 +257,16 @@ export default function RealEstateExperience() {
   const [listings, setListings] = useState<SaleListing[]>([]);
   const [listingsLoading, setListingsLoading] = useState(true);
   const [listingsError, setListingsError] = useState("");
-  const [location, setLocation] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const [filters, setFilters] = useState<ListingFiltersValue>({
+    location: "",
+    propertyType: "",
+    minPrice: "",
+    maxPrice: "",
+    minBedrooms: "",
+  });
+  const [currentPage, setCurrentPage] = useState(1);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -188,15 +274,15 @@ export default function RealEstateExperience() {
     async function loadListings() {
       try {
         const response = await fetch("/api/real-estate/listings");
-        if (!response.ok) {
-          throw new Error("Unable to load sale listings");
-        }
+        if (!response.ok) throw new Error("Unable to load sale listings");
 
         const result = (await response.json()) as { listings: SaleListing[] };
         if (active) setListings(result.listings);
       } catch (error) {
         console.error("Error loading sale listings:", error);
-        if (active) setListingsError("Unable to load sale listings. Please try again later.");
+        if (active) {
+          setListingsError("Unable to load sale listings. Please try again later.");
+        }
       } finally {
         if (active) setListingsLoading(false);
       }
@@ -209,6 +295,12 @@ export default function RealEstateExperience() {
   }, []);
 
   useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
     const syncTabWithHash = () => {
       setActiveTab(window.location.hash === "#pricing" ? "pricing" : "listings");
     };
@@ -218,53 +310,9 @@ export default function RealEstateExperience() {
     return () => window.removeEventListener("hashchange", syncTabWithHash);
   }, []);
 
-  const selectTab = (tab: RealEstateTab) => {
-    setActiveTab(tab);
-    const url = new URL(window.location.href);
-    if (tab === "pricing") {
-      url.hash = "pricing";
-    } else {
-      url.hash = "";
-    }
-    window.history.replaceState(null, "", url);
-  };
-
-  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-
-    const nextTab = activeTab === "listings" ? "pricing" : "listings";
-    selectTab(nextTab);
-    document
-      .getElementById(`real-estate-${nextTab}-tab`)
-      ?.focus();
-  };
-
-  const clearFilters = () => {
-    setLocation("");
-    setPropertyType("");
-    setMinPrice("");
-    setMaxPrice("");
-  };
-
-  const hasFilters = Boolean(location || propertyType || minPrice || maxPrice);
-  const activeFilterCount = [location, propertyType, minPrice, maxPrice].filter(Boolean).length;
-  const filterValues = { location, propertyType, minPrice, maxPrice };
-  const updateFilters = (filters: ListingFiltersValue) => {
-    setLocation(filters.location);
-    setPropertyType(filters.propertyType);
-    setMinPrice(filters.minPrice);
-    setMaxPrice(filters.maxPrice);
-  };
-  const filteredListings = listings.filter((listing) => {
-    const listingLocation = `${listing.city} ${listing.neighborhood}`.toLowerCase();
-    const matchesLocation = !location || listingLocation.includes(location.toLowerCase());
-    const matchesType =
-      !propertyType || listing.property_type.toLowerCase() === propertyType.toLowerCase();
-    const matchesMinPrice = !minPrice || listing.price >= Number(minPrice);
-    const matchesMaxPrice = !maxPrice || listing.price <= Number(maxPrice);
-    return matchesLocation && matchesType && matchesMinPrice && matchesMaxPrice;
-  });
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
   useEffect(() => {
     if (!showFilterModal) return;
@@ -272,13 +320,118 @@ export default function RealEstateExperience() {
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") setShowFilterModal(false);
     };
-
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [showFilterModal]);
 
+  const selectTab = (tab: RealEstateTab) => {
+    setActiveTab(tab);
+    const url = new URL(window.location.href);
+    url.hash = tab === "pricing" ? "pricing" : "";
+    window.history.replaceState(null, "", url);
+  };
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const nextTab = activeTab === "listings" ? "pricing" : "listings";
+    selectTab(nextTab);
+    document.getElementById(`real-estate-${nextTab}-tab`)?.focus();
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      location: "",
+      propertyType: "",
+      minPrice: "",
+      maxPrice: "",
+      minBedrooms: "",
+    });
+  };
+
+  const hasFilters = Object.values(filters).some(Boolean);
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+  const sliderMax = useMemo(() => {
+    const highestPrice = Math.max(
+      MIN_PRICE_SLIDER_MAX,
+      ...listings.map((listing) => listing.price),
+      Number(filters.minPrice) || 0,
+      Number(filters.maxPrice) || 0,
+    );
+    return Math.ceil(highestPrice / 1_000_000) * 1_000_000;
+  }, [filters.maxPrice, filters.minPrice, listings]);
+  const filteredListings = useMemo(() => {
+    const searchLocation = filters.location.trim().toLowerCase();
+    const minimumPrice = filters.minPrice ? Number(filters.minPrice) : null;
+    const maximumPrice = filters.maxPrice ? Number(filters.maxPrice) : null;
+    const minimumBedrooms = filters.minBedrooms ? Number(filters.minBedrooms) : null;
+
+    return listings.filter((listing) => {
+      const listingLocation = `${listing.city} ${listing.neighborhood}`.toLowerCase();
+      if (searchLocation && !listingLocation.includes(searchLocation)) return false;
+      if (
+        filters.propertyType &&
+        listing.property_type.toLowerCase() !== filters.propertyType.toLowerCase()
+      ) {
+        return false;
+      }
+      if (minimumPrice !== null && listing.price < minimumPrice) return false;
+      if (maximumPrice !== null && listing.price > maximumPrice) return false;
+      if (minimumBedrooms !== null && listing.bedrooms < minimumBedrooms) return false;
+      return true;
+    });
+  }, [filters, listings]);
+
+  const totalPages = Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
+  const startIndex = (currentPage - 1) * LISTINGS_PER_PAGE;
+  const currentListings = filteredListings.slice(
+    startIndex,
+    startIndex + LISTINGS_PER_PAGE,
+  );
+
+  const changePage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <main className="min-h-screen bg-bg-light">
+    <main className="min-h-screen bg-white">
+      {isScrolled && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-8 right-8 z-50 rounded-full bg-primary-blue p-3 text-white shadow-lg transition-colors hover:bg-primary-blue-hover"
+          aria-label="Scroll to top"
+        >
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
+      )}
+
+      <div
+        className={`fixed left-0 right-0 top-16 z-40 border-b border-border-gray bg-white transition-transform duration-300 lg:hidden ${
+          isScrolled && activeTab === "listings" ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
+        <div className="container-custom flex items-center justify-between py-3">
+          <button
+            type="button"
+            onClick={() => setShowFilterModal(true)}
+            className="flex items-center gap-2 rounded-card border border-border-gray px-4 py-2 hover:bg-bg-light"
+          >
+            <span className="font-medium">Filter</span>
+            {activeFilterCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-blue px-1 text-xs font-bold text-white">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+          <span className="text-sm text-text-secondary">
+            {filteredListings.length} properties
+          </span>
+        </div>
+      </div>
+
       <section className="bg-white pb-4 pt-7 sm:pt-8">
         <div className="container-custom">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -295,7 +448,9 @@ export default function RealEstateExperience() {
                     ? "Loading properties for sale..."
                     : listingsError
                       ? "Unable to load properties for sale"
-                      : `Showing ${filteredListings.length} ${filteredListings.length === 1 ? "property" : "properties"} for sale`
+                      : `Showing ${
+                          filteredListings.length === 0 ? 0 : startIndex + 1
+                        }-${Math.min(startIndex + LISTINGS_PER_PAGE, filteredListings.length)} of ${filteredListings.length} properties for sale`
                   : "Proposed listing and marketing options"}
               </p>
             </div>
@@ -344,21 +499,35 @@ export default function RealEstateExperience() {
 
       {activeTab === "listings" ? (
         <section
-          key="listings"
           id="real-estate-listings-panel"
           role="tabpanel"
           aria-labelledby="real-estate-listings-tab"
-          className="real-estate-tab-panel container-custom py-5 sm:py-6"
+          className="container-custom pb-8 pt-4"
         >
+          <div className="mb-4 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setShowFilterModal(true)}
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-card border border-border-gray px-4 py-2 hover:bg-bg-light"
+            >
+              <span className="font-medium">Filter properties</span>
+              {activeFilterCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-blue px-1 text-xs font-bold text-white">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <aside className="hidden lg:block lg:col-span-3">
+            <aside className="hidden lg:col-span-3 lg:block">
               <div className="sticky top-20 space-y-3">
-                <ListingFilters value={filterValues} onChange={updateFilters} />
+                <ListingFilters value={filters} onChange={setFilters} sliderMax={sliderMax} />
                 <button
                   type="button"
                   onClick={clearFilters}
                   disabled={!hasFilters}
-                  className="w-full rounded-card py-2 text-sm font-medium text-primary-blue hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-card py-2 text-sm font-medium text-primary-blue hover:bg-bg-light disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Clear All Filters
                 </button>
@@ -366,84 +535,109 @@ export default function RealEstateExperience() {
             </aside>
 
             <div className="lg:col-span-9">
-              <div className="mb-4 lg:hidden">
-                <button
-                  type="button"
-                  onClick={() => setShowFilterModal(true)}
-                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-card border border-border-gray bg-white px-4 py-2 text-sm font-medium text-text-primary"
-                >
-                  <span aria-hidden="true">☰</span>
-                  Filters
-                  {activeFilterCount > 0 && (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-blue px-1 text-xs font-bold text-white">
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </button>
-              </div>
-
               {listingsError ? (
                 <div
                   role="alert"
-                  className="rounded-card border border-red-200 bg-white px-5 py-12 text-center text-sm text-red-700 sm:px-8 sm:py-16"
+                  className="py-16 text-center text-sm text-red-700"
                 >
                   {listingsError}
                 </div>
               ) : listingsLoading ? (
-                <div
-                  className="rounded-card border border-border-gray bg-white px-5 py-12 text-center text-text-secondary sm:px-8 sm:py-16"
-                  role="status"
-                >
+                <div className="py-16 text-center text-text-secondary" role="status">
+                  <div className="mb-4 text-4xl">⏳</div>
                   Loading sale listings...
                 </div>
-              ) : filteredListings.length > 0 ? (
-                <div className="space-y-5">
-                  {filteredListings.map((listing) => (
-                    <SaleListingCard key={listing.id} listing={listing} />
-                  ))}
-                </div>
+              ) : currentListings.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                    {currentListings.map((listing) => (
+                      <SaleListingCard key={listing.id} listing={listing} />
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex flex-col items-center gap-4">
+                      <p className="text-sm text-text-secondary">
+                        Page {currentPage} of {totalPages}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => changePage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="rounded-card border border-border-gray px-3 py-2 text-sm font-medium transition-colors hover:bg-bg-light disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          ← Previous
+                        </button>
+                        <div className="flex gap-1">
+                          {Array.from({ length: totalPages }, (_, index) => index + 1)
+                            .filter(
+                              (page) =>
+                                page === 1 ||
+                                page === totalPages ||
+                                (page >= currentPage - 1 && page <= currentPage + 1),
+                            )
+                            .map((page, index, pages) => (
+                              <span key={page} className="flex items-center gap-1">
+                                {index > 0 && pages[index - 1] !== page - 1 && (
+                                  <span className="px-1 text-text-secondary">...</span>
+                                )}
+                                <button
+                                  onClick={() => changePage(page)}
+                                  aria-current={page === currentPage ? "page" : undefined}
+                                  className={`rounded-card px-3 py-2 text-sm font-medium transition-colors ${
+                                    page === currentPage
+                                      ? "bg-primary-blue text-white"
+                                      : "border border-border-gray hover:bg-bg-light"
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              </span>
+                            ))}
+                        </div>
+                        <button
+                          onClick={() => changePage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="rounded-card border border-border-gray px-3 py-2 text-sm font-medium transition-colors hover:bg-bg-light disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Next →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="min-h-[350px] rounded-card border border-border-gray bg-white px-5 py-12 text-center sm:px-8 sm:py-16">
-                  <span
-                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-bg-light text-2xl"
-                    aria-hidden="true"
-                  >
-                    🏠
-                  </span>
-                  <h2 className="text-xl font-semibold text-text-primary sm:text-2xl">
+                <div className="py-16 text-center">
+                  <div className="mb-4 text-6xl">🏠</div>
+                  <h2 className="mb-2 text-2xl font-semibold">
                     {hasFilters ? "No properties match those filters" : "No sale listings yet"}
                   </h2>
-                  <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-text-secondary sm:text-base">
+                  <p className="mb-6 text-text-secondary">
                     {hasFilters
-                      ? "Try changing or clearing your filters."
+                      ? "Try adjusting your filters to see more results."
                       : "We’re preparing the first properties for sale. Contact us and tell us what you’re looking for."}
                   </p>
-                  <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                    {hasFilters && (
-                      <button
-                        type="button"
-                        onClick={clearFilters}
-                        className="inline-flex min-h-11 items-center justify-center rounded-full border border-border-gray px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
-                      >
-                        Clear filters
-                      </button>
-                    )}
+                  {hasFilters ? (
+                    <button type="button" onClick={clearFilters} className="btn-primary">
+                      Clear Filters
+                    </button>
+                  ) : (
                     <a
                       href={getBuyerWhatsAppUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
+                      className="btn-primary"
                     >
                       Ask about available properties
                     </a>
-                  </div>
+                  )}
                 </div>
               )}
 
               <button
                 type="button"
                 onClick={() => selectTab("pricing")}
-                className="mt-4 w-full rounded-card border border-border-gray bg-white px-4 py-3 text-center text-sm font-medium text-primary-blue hover:bg-bg-light"
+                className="mt-5 w-full rounded-card border border-border-gray bg-white px-4 py-3 text-center text-sm font-medium text-primary-blue hover:bg-bg-light"
               >
                 Selling a property? View marketing options
               </button>
@@ -460,11 +654,10 @@ export default function RealEstateExperience() {
         </section>
       ) : (
         <section
-          key="pricing"
           id="real-estate-pricing-panel"
           role="tabpanel"
           aria-labelledby="real-estate-pricing-tab"
-          className="real-estate-tab-panel container-custom py-5 sm:py-6"
+          className="container-custom pb-8 pt-5"
         >
           <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -487,14 +680,11 @@ export default function RealEstateExperience() {
                 className="flex flex-col rounded-card border border-border-gray bg-white p-6 sm:p-7"
               >
                 <div className="mb-5">
-                  <h3 className="text-xl font-semibold text-text-primary">
-                    {plan.name}
-                  </h3>
+                  <h3 className="text-xl font-semibold text-text-primary">{plan.name}</h3>
                   <p className="mt-2 min-h-10 text-sm leading-6 text-text-secondary">
                     {plan.summary}
                   </p>
                 </div>
-
                 <p className="mb-1 text-3xl font-semibold text-text-primary">
                   {plan.price !== "Custom" && (
                     <span className="mr-1 text-base font-medium text-text-secondary">
@@ -503,24 +693,17 @@ export default function RealEstateExperience() {
                   )}
                   {plan.price}
                 </p>
-                <p className="mb-5 text-xs text-text-secondary">
-                  {plan.priceNote}
-                </p>
-
+                <p className="mb-5 text-xs text-text-secondary">{plan.priceNote}</p>
                 <ul className="mb-6 flex-1 space-y-3 text-sm text-text-secondary">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <span
-                        aria-hidden="true"
-                        className="mt-0.5 font-semibold text-primary-blue"
-                      >
+                      <span aria-hidden="true" className="mt-0.5 font-semibold text-primary-blue">
                         ✓
                       </span>
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
-
                 <a
                   href={getWhatsAppUrl(plan.name)}
                   target="_blank"
@@ -534,10 +717,10 @@ export default function RealEstateExperience() {
           </div>
 
           <p className="mx-auto mt-7 max-w-3xl text-center text-xs leading-5 text-text-secondary sm:text-sm">
-            Advertising budgets are agreed separately and paid toward the
-            selected platforms. A campaign can increase visibility, but
-            impressions, enquiries, and sales are not guaranteed. These proposed
-            options and prices are subject to confirmation before booking.
+            Advertising budgets are agreed separately and paid toward the selected
+            platforms. A campaign can increase visibility, but impressions, enquiries,
+            and sales are not guaranteed. These proposed options and prices are subject
+            to confirmation before booking.
           </p>
         </section>
       )}
@@ -568,7 +751,7 @@ export default function RealEstateExperience() {
                 Close
               </button>
             </div>
-            <ListingFilters value={filterValues} onChange={updateFilters} />
+            <ListingFilters value={filters} onChange={setFilters} sliderMax={sliderMax} />
             <div className="mt-4 grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -582,7 +765,7 @@ export default function RealEstateExperience() {
                 onClick={() => setShowFilterModal(false)}
                 className="min-h-11 rounded-full bg-primary-blue px-4 py-2 text-sm font-semibold text-white"
               >
-                Apply filters
+                Show {filteredListings.length} properties
               </button>
             </div>
           </section>
