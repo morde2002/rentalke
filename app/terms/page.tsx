@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "Read the terms that apply when using RentalKE to browse rental properties and property listings in Kenya.",
+    "Review the terms for using RentalKE to browse rental homes and property listings in Kenya.",
   alternates: {
     canonical: "/terms",
   },

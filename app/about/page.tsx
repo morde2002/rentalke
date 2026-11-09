@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About RentalKE",
   description:
-    "Learn about RentalKE and our work helping people discover rental homes and property opportunities in Kenya.",
+    "Learn about RentalKE, a Kenyan property platform for finding rental homes and properties for sale.",
   alternates: {
     canonical: "/about",
   },

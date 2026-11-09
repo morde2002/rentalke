@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPropertyById } from "@/lib/properties";
+import { fitMetaDescription } from "@/lib/seo";
 import { absoluteSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata({
@@ -32,19 +33,12 @@ export async function generateMetadata({
     property.bathroom,
     property.water_included === true ? "water included" : null,
     property.security_type ? `${property.security_type.replaceAll("_", " ")} security` : null,
-    property.video_url ? "video tour available" : null,
   ]
     .filter(Boolean)
     .join(", ");
-  const description = [
-    `${property.type} for rent in ${property.neighborhood}, ${property.city}.`,
-    priceText,
-    details ? `${details}.` : "",
-    property.description || "",
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .slice(0, 300);
+  const description = fitMetaDescription(
+    `Find a rental in ${property.neighborhood}, ${property.city} for ${priceText}. ${details ? `${details}. ` : ""}View photos and property details on RentalKE.`,
+  );
 
   return {
     title,

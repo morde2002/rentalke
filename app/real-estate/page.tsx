@@ -9,21 +9,21 @@ import { absoluteSiteUrl } from "@/lib/site-url";
 export const metadata: Metadata = {
   title: "Property for Sale in Kenya | Houses, Villas and Land",
   description:
-    "Browse houses, apartments, villas, land, and commercial property for sale in Kenya. Compare prices, explore photos and video tours, and contact sellers.",
+    "Browse houses, villas, land, and commercial property for sale in Kenya. Compare prices, photos, and details on RentalKE.",
   alternates: {
     canonical: "/real-estate",
   },
   openGraph: {
     title: "Property for Sale in Kenya | RentalKE",
     description:
-      "Browse houses, apartments, villas, land, and commercial property for sale in Kenya.",
+      "Browse houses, villas, land, and commercial property for sale in Kenya on RentalKE.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Property for Sale in Kenya | RentalKE",
     description:
-      "Browse houses, apartments, villas, land, and commercial property for sale in Kenya.",
+      "Browse houses, villas, land, and commercial property for sale in Kenya on RentalKE.",
   },
 };
 

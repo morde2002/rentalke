@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SaleListingDetails from "@/components/SaleListingDetails";
+import { fitMetaDescription } from "@/lib/seo";
 import { getSaleListingBySlug } from "@/lib/sale-listings";
 import { absoluteSiteUrl } from "@/lib/site-url";
 
@@ -22,7 +23,9 @@ export async function generateMetadata({
   }
 
   const title = listing.title;
-  const description = listing.description.slice(0, 300);
+  const description = fitMetaDescription(
+    `${listing.title}. Price: KSh ${listing.price.toLocaleString()}. View ${listing.images.length} photos${listing.video_url ? " and a video tour" : ""} on RentalKE.`,
+  );
   const url = absoluteSiteUrl(`/real-estate/listings/${listing.slug}`);
 
   return {

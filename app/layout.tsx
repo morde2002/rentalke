@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | RentalKE",
   },
   description:
-    "Find rental homes in Mombasa and across Kenya, or browse houses, apartments, villas, and land for sale. Explore property photos, video tours, prices, and local listings on RentalKE.",
+    "Find rental homes in Kenya and browse houses, villas, and land for sale. Compare property prices, photos, and video tours on RentalKE.",
   alternates: {
     canonical: "/",
   },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RentalKE | Rental Homes and Property for Sale in Kenya",
     description:
-      "Find rental homes in Mombasa and across Kenya, or browse houses, apartments, villas, and land for sale.",
+      "Browse rental homes and property for sale in Kenya. View prices, photos, and video tours on RentalKE.",
     url: process.env.NEXT_PUBLIC_SITE_URL || "https://rentalke.com",
     siteName: "RentalKE",
     images: [
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RentalKE | Rental Homes and Property for Sale in Kenya",
     description:
-      "Find rental homes in Mombasa and across Kenya, or browse properties for sale.",
+      "Find rental homes and property for sale across Kenya with RentalKE.",
     images: ["/og-image.png"],
   },
   robots: {

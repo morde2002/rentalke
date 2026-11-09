@@ -7,14 +7,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "List a Rental Property in Kenya",
   description:
-    "List your rental property on RentalKE and connect with people looking for homes in Kenya. Learn how to submit your property and its details.",
+    "List your rental property on RentalKE to reach people looking for homes in Kenya. Learn how to submit your property details.",
   alternates: {
     canonical: "/landlords",
   },
   openGraph: {
     title: "List a Rental Property in Kenya | RentalKE",
     description:
-      "Learn how to list your rental property on RentalKE and connect with people looking for homes in Kenya.",
+      "List your rental property on RentalKE and reach people searching for homes in Kenya.",
     type: "website",
   },
 };

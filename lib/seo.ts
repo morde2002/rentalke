@@ -1,6 +1,20 @@
 import { absoluteSiteUrl } from "@/lib/site-url";
 
 // SEO helper functions for dynamic pages
+const FALLBACK_META_DESCRIPTION =
+  "Explore rental homes and property listings across Kenya with RentalKE.";
+
+export function fitMetaDescription(description: string): string {
+  const normalized = description.replace(/\s+/g, " ").trim();
+  const candidate =
+    normalized.length >= 25 ? normalized : FALLBACK_META_DESCRIPTION;
+
+  if (candidate.length <= 160) return candidate;
+
+  const truncated = candidate.slice(0, 157);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return `${truncated.slice(0, lastSpace > 0 ? lastSpace : 157).trimEnd()}...`;
+}
 
 export function generatePropertyTitle(property: {
   type: string;

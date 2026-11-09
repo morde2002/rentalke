@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Contact RentalKE",
     description:
-      "Contact RentalKE for help with rental listings and property enquiries in Kenya.",
+      "Contact RentalKE about rental listings, property enquiries, or selling property in Kenya.",
     type: "website",
   },
 };
