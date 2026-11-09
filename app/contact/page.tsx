@@ -2,10 +2,21 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollReveal from "@/components/ScrollReveal";
 import Link from "next/link";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Contact Us - RentalKE",
-  description: "Get in touch with RentalKE. We're here to help you find your next home or list your property.",
+export const metadata: Metadata = {
+  title: "Contact RentalKE",
+  description:
+    "Contact RentalKE for help with rental listings, property enquiries, or listing a property for sale in Kenya.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact RentalKE",
+    description:
+      "Contact RentalKE for help with rental listings and property enquiries in Kenya.",
+    type: "website",
+  },
 };
 
 export default function ContactPage() {

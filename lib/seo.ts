@@ -1,3 +1,5 @@
+import { absoluteSiteUrl } from "@/lib/site-url";
+
 // SEO helper functions for dynamic pages
 
 export function generatePropertyTitle(property: {
@@ -130,14 +132,9 @@ export function generateOrganizationSchema() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "RentalKE",
-    "url": process.env.NEXT_PUBLIC_SITE_URL || "https://rentalke.vercel.app",
-    "logo": `${process.env.NEXT_PUBLIC_SITE_URL || "https://rentalke.vercel.app"}/images/rentalkelogo.png`,
-    "description": "Find verified rental houses in Kenya. Direct landlord contact, no agent fees.",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Mombasa",
-      "addressCountry": "KE"
-    },
+    "url": absoluteSiteUrl(),
+    "logo": absoluteSiteUrl("/images/rentalke-logo.png"),
+    "description": "RentalKE helps people discover rental homes and properties for sale in Kenya.",
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+254-115-588-218",
@@ -145,32 +142,17 @@ export function generateOrganizationSchema() {
       "email": "info.rentalke@gmail.com",
       "areaServed": "KE",
       "availableLanguage": ["en", "sw"]
-    },
-    "sameAs": [
-      "https://tiktok.com/@rentalke", // Update with actual social media links
-      "https://instagram.com/rentalke",
-      "https://facebook.com/rentalke"
-    ]
+    }
   };
 }
 
-// Website structured data
 export function generateWebsiteSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://rentalke.vercel.app";
-
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "RentalKE",
-    "url": baseUrl,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${baseUrl}/search?q={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
-    }
+    "url": absoluteSiteUrl(),
+    "inLanguage": ["en-KE", "sw-KE"],
   };
 }
 

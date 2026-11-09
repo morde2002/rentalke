@@ -5,20 +5,16 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "List Your Property FREE - Landlords",
-  description: "List your rental property for FREE on RentalKE. Connect directly with verified tenants in Mombasa, Nairobi, Kenya. No commissions, no agent fees, no middlemen. Get instant exposure to thousands of house hunters.",
-  keywords: [
-    "list property Kenya",
-    "landlord listings Kenya",
-    "free property listing Kenya",
-    "rent out property Mombasa",
-    "landlord Nairobi",
-    "no commission property listing",
-    "advertise rental property Kenya",
-  ],
+  title: "List a Rental Property in Kenya",
+  description:
+    "List your rental property on RentalKE and connect with people looking for homes in Kenya. Learn how to submit your property and its details.",
+  alternates: {
+    canonical: "/landlords",
+  },
   openGraph: {
-    title: "List Your Property FREE - Connect with Tenants | RentalKE",
-    description: "List your rental property for FREE. Connect directly with verified tenants in Kenya. No commissions, no agent fees.",
+    title: "List a Rental Property in Kenya | RentalKE",
+    description:
+      "Learn how to list your rental property on RentalKE and connect with people looking for homes in Kenya.",
     type: "website",
   },
 };

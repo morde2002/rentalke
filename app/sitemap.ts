@@ -1,69 +1,46 @@
-import { MetadataRoute } from 'next'
-import { getProperties } from '@/lib/properties'
+import type { MetadataRoute } from "next";
+import { getProperties } from "@/lib/properties";
+import { getSaleListings } from "@/lib/sale-listings";
+import { absoluteSiteUrl } from "@/lib/site-url";
+
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentalke.vercel.app'
+  const staticPaths = [
+    "/",
+    "/search",
+    "/real-estate",
+    "/landlords",
+    "/contact",
+    "/about",
+    "/terms",
+    "/privacy",
+  ];
 
-  // Static pages
-  const staticPages = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/search`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/real-estate`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/landlords`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
-    },
-  ]
+  const [propertiesResult, saleListingsResult] = await Promise.allSettled([
+    getProperties({ available: true }),
+    getSaleListings(),
+  ]);
+  const properties =
+    propertiesResult.status === "fulfilled" ? propertiesResult.value : [];
+  const saleListings =
+    saleListingsResult.status === "fulfilled" ? saleListingsResult.value : [];
 
-  // Dynamic property pages
-  const properties = await getProperties({ available: undefined }) // Get all properties
-  const propertyPages = properties.map((property) => ({
-    url: `${baseUrl}/homes/${property.id}`,
-    lastModified: property.updated_at ? new Date(property.updated_at) : new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
+  if (propertiesResult.status === "rejected") {
+    console.error("Rental listings could not be added to the sitemap:", propertiesResult.reason);
+  }
+  if (saleListingsResult.status === "rejected") {
+    console.error("Sale listings could not be added to the sitemap:", saleListingsResult.reason);
+  }
 
-  return [...staticPages, ...propertyPages]
+  return [
+    ...staticPaths.map((path) => ({ url: absoluteSiteUrl(path) })),
+    ...properties.map((property) => ({
+      url: absoluteSiteUrl(`/homes/${property.id}`),
+      ...(property.updated_at && { lastModified: new Date(property.updated_at) }),
+    })),
+    ...saleListings.map((listing) => ({
+      url: absoluteSiteUrl(`/real-estate/listings/${listing.slug}`),
+    })),
+  ];
 }

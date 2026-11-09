@@ -5,18 +5,16 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us - Our Mission",
-  description: "Learn about RentalKE's mission to make affordable housing accessible to everyone in Kenya. We connect tenants directly with verified landlords in Mombasa, Nairobi, and across Kenya. No agents, no hidden fees.",
-  keywords: [
-    "about RentalKE",
-    "affordable housing Kenya",
-    "rental platform Kenya",
-    "verified landlords Kenya",
-    "no agent rentals Kenya",
-  ],
+  title: "About RentalKE",
+  description:
+    "Learn about RentalKE and our work helping people discover rental homes and property opportunities in Kenya.",
+  alternates: {
+    canonical: "/about",
+  },
   openGraph: {
-    title: "About RentalKE - Making Housing Affordable for Everyone",
-    description: "Connecting Kenyan renters with verified landlords. No agents, no hidden fees, just honest rental listings.",
+    title: "About RentalKE",
+    description:
+      "Learn about RentalKE and our work helping people discover rental homes and property opportunities in Kenya.",
     type: "website",
   },
 };

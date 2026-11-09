@@ -6,7 +6,11 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "RentalKE Privacy Policy. Learn how we protect your personal information, handle your data, and respect your privacy when using our rental property platform in Kenya.",
+  description:
+    "Read RentalKE's privacy policy to learn how personal information is handled when you use our property listing services in Kenya.",
+  alternates: {
+    canonical: "/privacy",
+  },
   robots: {
     index: true,
     follow: true,

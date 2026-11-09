@@ -252,11 +252,17 @@ function getBuyerWhatsAppUrl() {
   return `https://wa.me/254115588218?text=${encodeURIComponent(message)}`;
 }
 
-export default function RealEstateExperience() {
+export default function RealEstateExperience({
+  initialListings,
+  initialListingsError,
+}: {
+  initialListings: SaleListing[];
+  initialListingsError: string;
+}) {
   const [activeTab, setActiveTab] = useState<RealEstateTab>("listings");
-  const [listings, setListings] = useState<SaleListing[]>([]);
-  const [listingsLoading, setListingsLoading] = useState(true);
-  const [listingsError, setListingsError] = useState("");
+  const [listings] = useState<SaleListing[]>(initialListings);
+  const listingsLoading = false;
+  const listingsError = initialListingsError;
   const [filters, setFilters] = useState<ListingFiltersValue>({
     location: "",
     propertyType: "",
@@ -267,32 +273,6 @@ export default function RealEstateExperience() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadListings() {
-      try {
-        const response = await fetch("/api/real-estate/listings");
-        if (!response.ok) throw new Error("Unable to load sale listings");
-
-        const result = (await response.json()) as { listings: SaleListing[] };
-        if (active) setListings(result.listings);
-      } catch (error) {
-        console.error("Error loading sale listings:", error);
-        if (active) {
-          setListingsError("Unable to load sale listings. Please try again later.");
-        }
-      } finally {
-        if (active) setListingsLoading(false);
-      }
-    }
-
-    loadListings();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);

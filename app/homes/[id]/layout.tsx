@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPropertyById } from "@/lib/properties";
+import { absoluteSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata({
   params,
@@ -13,69 +14,53 @@ export async function generateMetadata({
     return {
       title: "Property Not Found",
       description: "The requested property could not be found.",
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   }
 
-  // Create SEO-optimized title (mirrors competitor strategy)
   const priceText = property.price !== null
     ? `KSh ${property.price.toLocaleString()}/month`
     : property.price_min != null && property.price_max != null
     ? `KSh ${property.price_min.toLocaleString()}-${property.price_max.toLocaleString()}/month`
     : "Price undisclosed";
-  const title = `${property.type} in ${property.neighborhood}, ${property.city} - ${priceText}${property.rentalke_visited ? ' | Verified' : ''}${property.video_url ? ' | Video Tour' : ''} | RentalKE`;
-
-  // Create detailed description (more comprehensive than competitors)
-  const description = `${property.type} for rent in ${property.neighborhood}, ${property.city}. ${priceText}${property.deposit ? ` + KSh ${property.deposit.toLocaleString()} deposit` : ''}. ${property.bedrooms}, ${property.bathroom}. ${property.water_included ? 'Water included in rent. ' : ''}${property.rentalke_visited ? 'Verified by RentalKE team. ' : ''}${property.video_url ? 'Video tour available. ' : ''}${property.security_type ? `Security: ${property.security_type.replace('_', ' ')}. ` : ''}Contact RentalKE for listing details. ${property.description?.slice(0, 120) || ''} Available now.`;
+  const title = `${property.type} for Rent in ${property.neighborhood}, ${property.city} - ${priceText}`;
+  const details = [
+    property.bedrooms,
+    property.bathroom,
+    property.water_included === true ? "water included" : null,
+    property.security_type ? `${property.security_type.replaceAll("_", " ")} security` : null,
+    property.video_url ? "video tour available" : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  const description = [
+    `${property.type} for rent in ${property.neighborhood}, ${property.city}.`,
+    priceText,
+    details ? `${details}.` : "",
+    property.description || "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .slice(0, 300);
 
   return {
     title,
     description,
-    keywords: [
-      // Property type + location (high search volume)
-      `${property.type} ${property.neighborhood}`,
-      `${property.type} ${property.city}`,
-      `${property.type.toLowerCase()} ${property.neighborhood}`,
-      `${property.type.toLowerCase()} ${property.city}`,
-
-      // Generic location searches
-      `houses for rent ${property.neighborhood}`,
-      `rental houses ${property.neighborhood}`,
-      `houses for rent ${property.city}`,
-      `apartments ${property.city}`,
-
-      // Price-specific (HIGH CONVERSION)
-      ...(property.price !== null ? [
-        `${property.price} shillings ${property.city}`,
-        `${property.price} shillings ${property.neighborhood}`,
-        `houses under ${Math.ceil(property.price / 1000) * 1000} ${property.city}`,
-      ] : []),
-      `affordable housing ${property.neighborhood}`,
-      `cheap houses for rent ${property.city}`,
-
-      // Bedroom-specific
-      `${property.bedrooms} ${property.city}`,
-      `${property.bedrooms} ${property.neighborhood}`,
-      `${property.bedrooms} Mombasa`,
-
-      // Location proximity
-      `houses near ${property.neighborhood}`,
-      `rental houses near ${property.neighborhood}`,
-
-      // Trust signals (competitive advantage)
-      ...(property.rentalke_visited ? ['verified rental Mombasa', 'verified houses Mombasa'] : []),
-      ...(property.video_url ? ['video tour rental Mombasa', 'virtual tour house Mombasa'] : []),
-      ...(property.water_included ? ['water included Mombasa'] : []),
-
-      // Swahili keywords (untapped market)
-      `nyumba ya kupanga ${property.neighborhood}`,
-      `nyumba za kupanga ${property.city}`,
-      `nyumba ${property.city}`,
-      `chumba kupanga ${property.city}`,
-    ],
+    alternates: {
+      canonical: absoluteSiteUrl(`/homes/${property.id}`),
+    },
+    robots: {
+      index: property.available,
+      follow: true,
+    },
     openGraph: {
       title,
       description,
       type: "website",
+      url: absoluteSiteUrl(`/homes/${property.id}`),
       images: property.images && property.images.length > 0 ? [
         {
           url: property.images[0],

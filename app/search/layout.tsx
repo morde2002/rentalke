@@ -1,26 +1,23 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Search Rental Houses in Mombasa, Kenya | RentalKE',
-  description: 'Search affordable rental houses and apartments in Mombasa, Kenya. Filter by price range, location, and type. View verified properties in Approved, Vijiweni, and more. Contact RentalKE for listing details and landlord referrals.',
-  keywords: [
-    'search rental houses Mombasa',
-    'find houses for rent Mombasa',
-    'affordable rentals Mombasa',
-    'houses for rent Mombasa',
-    'cheap houses Mombasa',
-    'double room Mombasa',
-    'bedsitter Mombasa',
-    '1 bedroom Mombasa',
-    'houses Approved Mombasa',
-    'houses Vijiweni',
-    'verified rental Mombasa',
-    'video tour houses Mombasa',
-  ],
+  title: "Rental Houses and Apartments in Kenya",
+  description:
+    "Browse rental homes in Kenya and filter listings by location, property type, availability, and price. View photos, details, and video tours for individual homes.",
+  alternates: {
+    canonical: "/search",
+  },
   openGraph: {
-    title: 'Search Rental Houses in Mombasa | RentalKE',
-    description: 'Find affordable rental houses in Mombasa. Double rooms from KSh 5,500/month. Verified properties with video tours.',
+    title: "Rental Houses and Apartments in Kenya",
+    description:
+      "Browse rental homes in Kenya and filter listings by location, property type, availability, and price.",
     type: 'website',
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rental Houses and Apartments in Kenya",
+    description:
+      "Browse rental homes in Kenya and filter listings by location, property type, availability, and price.",
   },
 };
 
