@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
+import SaleListingCard from "@/components/SaleListingCard";
+import type { SaleListing } from "@/types/real-estate";
 
 type RealEstateTab = "listings" | "pricing";
 
@@ -63,7 +65,7 @@ const packages = [
   },
 ];
 
-const propertyTypes = ["House", "Apartment", "Land", "Commercial property"];
+const propertyTypes = ["House", "Apartment", "Villa", "Land", "Commercial property"];
 
 interface ListingFiltersValue {
   location: string;
@@ -171,11 +173,40 @@ function getBuyerWhatsAppUrl() {
 
 export default function RealEstateExperience() {
   const [activeTab, setActiveTab] = useState<RealEstateTab>("listings");
+  const [listings, setListings] = useState<SaleListing[]>([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
+  const [listingsError, setListingsError] = useState("");
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [showFilterModal, setShowFilterModal] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadListings() {
+      try {
+        const response = await fetch("/api/real-estate/listings");
+        if (!response.ok) {
+          throw new Error("Unable to load sale listings");
+        }
+
+        const result = (await response.json()) as { listings: SaleListing[] };
+        if (active) setListings(result.listings);
+      } catch (error) {
+        console.error("Error loading sale listings:", error);
+        if (active) setListingsError("Unable to load sale listings. Please try again later.");
+      } finally {
+        if (active) setListingsLoading(false);
+      }
+    }
+
+    loadListings();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const syncTabWithHash = () => {
@@ -225,6 +256,15 @@ export default function RealEstateExperience() {
     setMinPrice(filters.minPrice);
     setMaxPrice(filters.maxPrice);
   };
+  const filteredListings = listings.filter((listing) => {
+    const listingLocation = `${listing.city} ${listing.neighborhood}`.toLowerCase();
+    const matchesLocation = !location || listingLocation.includes(location.toLowerCase());
+    const matchesType =
+      !propertyType || listing.property_type.toLowerCase() === propertyType.toLowerCase();
+    const matchesMinPrice = !minPrice || listing.price >= Number(minPrice);
+    const matchesMaxPrice = !maxPrice || listing.price <= Number(maxPrice);
+    return matchesLocation && matchesType && matchesMinPrice && matchesMaxPrice;
+  });
 
   useEffect(() => {
     if (!showFilterModal) return;
@@ -251,7 +291,11 @@ export default function RealEstateExperience() {
               </h1>
               <p className="mt-1 text-sm text-text-secondary">
                 {activeTab === "listings"
-                  ? "Showing 0 properties for sale"
+                  ? listingsLoading
+                    ? "Loading properties for sale..."
+                    : listingsError
+                      ? "Unable to load properties for sale"
+                      : `Showing ${filteredListings.length} ${filteredListings.length === 1 ? "property" : "properties"} for sale`
                   : "Proposed listing and marketing options"}
               </p>
             </div>
@@ -338,40 +382,63 @@ export default function RealEstateExperience() {
                 </button>
               </div>
 
-              <div className="min-h-[350px] rounded-card border border-border-gray bg-white px-5 py-12 text-center sm:px-8 sm:py-16">
-                <span
-                  className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-bg-light text-2xl"
-                  aria-hidden="true"
+              {listingsError ? (
+                <div
+                  role="alert"
+                  className="rounded-card border border-red-200 bg-white px-5 py-12 text-center text-sm text-red-700 sm:px-8 sm:py-16"
                 >
-                  🏠
-                </span>
-                <h2 className="text-xl font-semibold text-text-primary sm:text-2xl">
-                  No sale listings yet
-                </h2>
-                <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-text-secondary sm:text-base">
-                  We’re preparing the first properties for sale. Contact us and
-                  tell us what you’re looking for.
-                </p>
-                <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                  {hasFilters && (
-                    <button
-                      type="button"
-                      onClick={clearFilters}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-border-gray px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                  <a
-                    href={getBuyerWhatsAppUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
-                  >
-                    Ask about available properties
-                  </a>
+                  {listingsError}
                 </div>
-              </div>
+              ) : listingsLoading ? (
+                <div
+                  className="rounded-card border border-border-gray bg-white px-5 py-12 text-center text-text-secondary sm:px-8 sm:py-16"
+                  role="status"
+                >
+                  Loading sale listings...
+                </div>
+              ) : filteredListings.length > 0 ? (
+                <div className="space-y-5">
+                  {filteredListings.map((listing) => (
+                    <SaleListingCard key={listing.id} listing={listing} />
+                  ))}
+                </div>
+              ) : (
+                <div className="min-h-[350px] rounded-card border border-border-gray bg-white px-5 py-12 text-center sm:px-8 sm:py-16">
+                  <span
+                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-bg-light text-2xl"
+                    aria-hidden="true"
+                  >
+                    🏠
+                  </span>
+                  <h2 className="text-xl font-semibold text-text-primary sm:text-2xl">
+                    {hasFilters ? "No properties match those filters" : "No sale listings yet"}
+                  </h2>
+                  <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-text-secondary sm:text-base">
+                    {hasFilters
+                      ? "Try changing or clearing your filters."
+                      : "We’re preparing the first properties for sale. Contact us and tell us what you’re looking for."}
+                  </p>
+                  <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                    {hasFilters && (
+                      <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="inline-flex min-h-11 items-center justify-center rounded-full border border-border-gray px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue"
+                      >
+                        Clear filters
+                      </button>
+                    )}
+                    <a
+                      href={getBuyerWhatsAppUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
+                    >
+                      Ask about available properties
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <button
                 type="button"
